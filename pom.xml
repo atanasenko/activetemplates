@@ -9,10 +9,5 @@
   <artifactId>activetemplates</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <dependencies>
-  	<dependency>
-  		<groupId>org.sleepless</groupId>
-  		<artifactId>core</artifactId>
-  		<version>0.1</version>
-  	</dependency>
   </dependencies>
 </project>

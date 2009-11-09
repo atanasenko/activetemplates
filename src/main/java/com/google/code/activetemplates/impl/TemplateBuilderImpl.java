@@ -28,9 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-import org.sleepless.core.deps.DependencyNode;
-import org.sleepless.core.deps.DependencyTree;
-
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateBuilder;
 import com.google.code.activetemplates.TemplateBuilderConfig;
@@ -40,6 +37,8 @@ import com.google.code.activetemplates.cache.XmlCache;
 import com.google.code.activetemplates.def.TemplateDefinition;
 import com.google.code.activetemplates.def.TemplateDefinitionSource;
 import com.google.code.activetemplates.tiles.TileSource;
+import com.google.code.activetemplates.util.deps.DependencyNode;
+import com.google.code.activetemplates.util.deps.DependencyTree;
 
 public class TemplateBuilderImpl implements TemplateBuilder {
 

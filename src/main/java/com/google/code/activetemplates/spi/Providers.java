@@ -19,7 +19,7 @@ package com.google.code.activetemplates.spi;
 import java.util.Collections;
 import java.util.List;
 
-import org.sleepless.core.jar.Services;
+import com.google.code.activetemplates.util.Services;
 
 public final class Providers {
 
