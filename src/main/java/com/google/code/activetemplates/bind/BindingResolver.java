@@ -16,10 +16,23 @@
 
 package com.google.code.activetemplates.bind;
 
-import com.google.code.activetemplates.Bindings;
 
-public interface BindingProvider {
-    
+/**
+ * Binding resolvers provide way to resolve objects provided some
+ * value.
+ * 
+ * @author sleepless
+ *
+ */
+public interface BindingResolver {
+   
+    /**
+     * Resolves passed value against specified bindings
+     * 
+     * @param value
+     * @param b
+     * @return
+     */
     public Object resolve(String value, Bindings b);
     
 }

@@ -22,12 +22,53 @@ import java.io.Writer;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
 
+import com.google.code.activetemplates.bind.Bindings;
+
+/**
+ * Template compiler takes a template and compiles it into target document
+ * using provided bindings.
+ * 
+ * @author sleepless
+ *
+ */
 public interface TemplateCompiler {
     
-    public void compile(Template t, OutputStream out) throws XMLStreamException;
+    /**
+     * Compiles template into specified outputStream.
+     * 
+     * @param t
+     * @param b
+     * @param out
+     * @throws XMLStreamException
+     */
+    public void compile(Template t, Bindings b, OutputStream out) throws XMLStreamException;
 
-    public void compile(Template t, Writer out) throws XMLStreamException;
+    /**
+     * Compiles template into specified reader.
+     * Compile method which takes OutputStream is preferrable to this one.
+     * 
+     * @param t
+     * @param b
+     * @param out
+     * @throws XMLStreamException
+     */
+    public void compile(Template t, Bindings b, Writer out) throws XMLStreamException;
 
-    public void compile(Template t, Result out) throws XMLStreamException;
+    /**
+     * Compiles template into specified xml Result.
+     * 
+     * @param t
+     * @param b
+     * @param out
+     * @throws XMLStreamException
+     */
+    public void compile(Template t, Bindings b, Result out) throws XMLStreamException;
+    
+    /**
+     * Creates a new Bindings object which can be populated with data and passed
+     * to the compile method.
+     * @return
+     */
+    public Bindings createBindings();
     
 }

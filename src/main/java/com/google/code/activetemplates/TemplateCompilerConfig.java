@@ -16,37 +16,32 @@
 
 package com.google.code.activetemplates;
 
-import javax.xml.transform.Source;
+import com.google.code.activetemplates.script.ScriptingProvider;
 
 /**
- * This class represents a prebuilt xml template document, which can
- * be compile into a target document
+ * Configuration for creating new TemplateCompilers
  * 
  * @author sleepless
+ *
  */
-public interface Template {
-   
+public class TemplateCompilerConfig {
+    
+    private ScriptingProvider scriptingProvider;
+
     /**
-     * Template name
-     * 
+     * Returns scriptingProvider which is used by template compiler
      * @return
      */
-    public String getName();
-    
+    public ScriptingProvider getScriptingProvider() {
+        return scriptingProvider;
+    }
+
     /**
-     * Creates a new template document source.
-     * This method returns a new source each time it is called, which must
-     * be closed with close method.
-     * 
-     * @return
+     * Sets a scriptingProvider to be used by template compiler
+     * @param scriptingProvider
      */
-    public Source createSource();
-    
-    /**
-     * Closes the source created by createSource
-     * 
-     * @param src
-     */
-    public void close(Source src);
+    public void setScriptingProvider(ScriptingProvider scriptingProvider) {
+        this.scriptingProvider = scriptingProvider;
+    }
     
 }

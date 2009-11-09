@@ -26,41 +26,87 @@ import com.google.code.activetemplates.cache.XmlCache;
 import com.google.code.activetemplates.def.TemplateDefinitionSource;
 import com.google.code.activetemplates.tiles.TileSource;
 
+/**
+ * Configuration object for creating TemplateBuilder instances
+ * 
+ * @author sleepless
+ *
+ */
 public class TemplateBuilderConfig {
     
     private XmlCache xmlCache;
     private Map<String, TileSource> tileSources;
     private List<TemplateDefinitionSource> definitionSources;
     
+    /**
+     * Returns XmlCache implementation which is used by template builder
+     * 
+     * @return
+     */
     public XmlCache getXmlCache() {
         return xmlCache;
     }
 
+    /**
+     * Sets XmlCache implementation to be used by template builder
+     * 
+     * @param xmlCache
+     */
     public void setXmlCache(XmlCache xmlCache) {
         this.xmlCache = xmlCache;
     }
 
+    /**
+     * Returns tile sources which are used by template builder
+     * @return
+     */
     public Map<String, TileSource> getTileSources() {
         return tileSources;
     }
 
+    /**
+     * Sets tile sources (tileSource prefixes are mapped to tile sources)
+     * to be used by template builder 
+     * @param tileSources
+     */
     public void setTileSources(Map<String, TileSource> tileSources) {
         this.tileSources = tileSources;
     }
     
+    /**
+     * Adds a new tile source to the tileSource map
+     * 
+     * @param key
+     * @param tileSource
+     */
     public void addTileSource(String key, TileSource tileSource) {
         if(tileSources == null) tileSources = new LinkedHashMap<String, TileSource>();
         tileSources.put(key, tileSource);
     }
     
+    /**
+     * Returns a list of template definition sources which are used by template builder
+     * 
+     * @return
+     */
     public List<TemplateDefinitionSource> getDefinitionSources() {
         return definitionSources;
     }
 
+    /**
+     * Sets a list of template definition sources to be used by template builder
+     * 
+     * @param definitionSources
+     */
     public void setDefinitionSources(List<TemplateDefinitionSource> definitionSources) {
         this.definitionSources = definitionSources;
     }
     
+    /**
+     * Adds a new template definition source to the list
+     * 
+     * @param definitionSource
+     */
     public void addDefinitionSource(TemplateDefinitionSource definitionSource) {
         if(definitionSources == null) definitionSources = new ArrayList<TemplateDefinitionSource>();
         definitionSources.add(definitionSource);

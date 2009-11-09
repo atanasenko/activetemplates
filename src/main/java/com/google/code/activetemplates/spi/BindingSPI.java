@@ -18,13 +18,13 @@ package com.google.code.activetemplates.spi;
 
 import java.util.Collection;
 
-import com.google.code.activetemplates.bind.BindingProvider;
+import com.google.code.activetemplates.bind.BindingResolver;
 
 public interface BindingSPI {
     
-    public Collection<String> getSupportedBindings();
+    public Collection<String> getSupportedBindingsPrefixes();
     
-    public BindingProvider createProvider(String name);
+    public BindingResolver createResolver(String name);
     
     public String getProviderName();
     

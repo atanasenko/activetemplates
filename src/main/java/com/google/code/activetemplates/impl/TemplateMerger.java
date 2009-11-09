@@ -30,7 +30,15 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
+import com.google.code.activetemplates.TemplateConstants;
+
 public class TemplateMerger {
+    
+    private static final QName TAG_INCLUDE = 
+        new QName(TemplateConstants.NAMESPACE_STDLIB, "include");
+    
+    private static final QName ATTR_NAME = 
+        new QName(TemplateConstants.NAMESPACE_STDLIB, "name");
     
     private String tName;
     private Result res;
@@ -60,11 +68,9 @@ public class TemplateMerger {
                     StartElement se = e.asStartElement();
                     QName qn = se.getName();
                     
-                    // TODO use namespaceURI
-                    if(qn.getLocalPart().equals("include")) {
+                    if(qn.equals(TAG_INCLUDE)) {
                         
-                        // TODO use namespaceURI
-                        Attribute incName = se.getAttributeByName(new QName(null, "name"));
+                        Attribute incName = se.getAttributeByName(ATTR_NAME);
                         if(incName == null) {
                             throw new IllegalStateException("Inclusion point must specify inject name");
                         }

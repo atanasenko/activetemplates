@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates;
+package com.google.code.activetemplates.script;
 
-public interface TemplateContext {
-    
-    public Template getCurrentTemplate();
-    
-    public Object getAttachment();
-    
-    
+import javax.script.Bindings;
+
+/**
+ * Compiled script
+ * 
+ * @author sleepless
+ *
+ */
+public interface Script {
+
+    /**
+     * Executes this script against specified bindings
+     * 
+     * @param b
+     * @return
+     */
+    public Object exec(Bindings b);
     
 }

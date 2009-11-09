@@ -19,16 +19,50 @@ package com.google.code.activetemplates.cache;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
+/**
+ * This interface is a general contract for caching xml documents.
+ * 
+ * Note that results and sources returned by this class should be closed explicitly
+ * using corresponding close methods defined by this interface.
+ * 
+ * @author sleepless
+ *
+ */
 public interface XmlCache {
 
+    /**
+     * Creates a new result and caches xml document written to it.
+     * 
+     * @param name
+     * @return
+     */
     public Result createResult(String name);
     
-    public Source getSource(String name);
+    /**
+     * Returns a cached xml document.
+     * 
+     * @param name
+     * @return
+     */
+    public Source createSource(String name);
     
+    /**
+     * Returns true if a document with specified name is cached in this XmlCache
+     * @param name
+     * @return
+     */
     public boolean contains(String name);
     
+    /**
+     * Closes result returned by createResult method
+     * @param res
+     */
     public void close(Result res);
     
+    /**
+     * Closes source returned by createSource method
+     * @param src
+     */
     public void close(Source src);
     
 }

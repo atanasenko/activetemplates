@@ -39,17 +39,26 @@ import javax.xml.transform.stream.StreamResult;
 
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateCompiler;
+import com.google.code.activetemplates.TemplateCompilerConfig;
+import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.script.ScriptingProvider;
 
 public class TemplateCompilerImpl implements TemplateCompiler {
     
+    private ScriptingProvider script;
     private XMLOutputFactory outFactory;
     private XMLInputFactory inFactory;
     private XMLEventFactory eFactory;
     private Handlers h;
     
-    public TemplateCompilerImpl(){
+    public TemplateCompilerImpl(TemplateCompilerConfig conf){
+        script = conf.getScriptingProvider();
+        if(script == null) {
+            throw new IllegalArgumentException("Scripting provider is not supplied");
+        }
+        
         outFactory = XMLOutputFactory.newInstance();
         inFactory = XMLInputFactory.newInstance();
         eFactory = XMLEventFactory.newInstance();
@@ -58,27 +67,27 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     }
 
     @Override
-    public void compile(Template t, OutputStream out) throws XMLStreamException {
-        compile(t, new StreamResult(out));
+    public void compile(Template t, Bindings b, OutputStream out) throws XMLStreamException {
+        compile(t, b, new StreamResult(out));
     }
 
     @Override
-    public void compile(Template t, Writer out) throws XMLStreamException {
-        compile(t, new StreamResult(out));
+    public void compile(Template t, Bindings b, Writer out) throws XMLStreamException {
+        compile(t, b, new StreamResult(out));
     }
 
     @Override
-    public void compile(Template t, Result out) throws XMLStreamException {
+    public void compile(Template t, Bindings b, Result out) throws XMLStreamException {
         
         TemplateImpl ti = (TemplateImpl) t;
         
-        Source s = t.getSource();
+        Source s = t.createSource();
         XMLEventWriter w = outFactory.createXMLEventWriter(out);
         XMLEventReader r = inFactory.createXMLEventReader(s);
         
         try {
             
-            CompileContext ctx = new CompileContext(r, w, eFactory);
+            CompileContext ctx = new CompileContext(r, w, eFactory, b);
             
             doCompile(ctx);
             
@@ -90,6 +99,12 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
     }
     
+    @Override
+    public Bindings createBindings() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     private void doCompile(CompileContext cc) throws XMLStreamException {
         
         while(cc.getReader().hasNext()) {

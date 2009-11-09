@@ -24,18 +24,22 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
+import com.google.code.activetemplates.bind.Bindings;
+
 public class CompileContext {
     
     private XMLEventReader reader;
     private XMLEventWriter writer;
     private XMLEventFactory elementFactory;
+    private Bindings bindings;
     
     private Queue<XMLEvent> eventQueue;
 
-    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef) {
+    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, Bindings b) {
         reader = r;
         writer = w;
         elementFactory = ef;
+        bindings = b;
         
         eventQueue = new LinkedList<XMLEvent>();
     }
@@ -52,6 +56,10 @@ public class CompileContext {
         return elementFactory;
     }
     
+    public Bindings getBindings() {
+        return bindings;
+    }
+
     public Queue<XMLEvent> getEventQueue(){
         return eventQueue;
     }

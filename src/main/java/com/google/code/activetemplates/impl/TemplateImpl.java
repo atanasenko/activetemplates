@@ -27,6 +27,12 @@ import com.google.code.activetemplates.cache.XmlCache;
 
 public class TemplateImpl implements Template {
     
+    public enum Access {
+        CONCRETE,
+        ABSTRACT,
+        INTERNAL;
+    }
+
     static final String RAW_PREFIX = "tiles/";
     static final String BUILD_PREFIX = "templates/";
 
@@ -78,9 +84,13 @@ public class TemplateImpl implements Template {
         this.inclusions = inclusions;
     }
 
-    public Source getSource(){
+    public void close(Source src) {
+        xmlCache.close(src);
+    }
+    
+    public Source createSource(){
         if(sourceName == null) return null;
-        return xmlCache.getSource(BUILD_PREFIX + name + ".xml");
+        return xmlCache.createSource(BUILD_PREFIX + name + ".xml");
     }
     
     public Result createResult() {
@@ -95,12 +105,12 @@ public class TemplateImpl implements Template {
 
     public Source getRawSource(){
         if(sourceName == null) return null;
-        return xmlCache.getSource(RAW_PREFIX + sourceName);
+        return xmlCache.createSource(RAW_PREFIX + sourceName);
     }
     
     public Result createRawResult() {
         if(sourceName == null) throw new IllegalStateException("Empty source");
         return xmlCache.createResult(RAW_PREFIX + sourceName);
     }
-    
+
 }

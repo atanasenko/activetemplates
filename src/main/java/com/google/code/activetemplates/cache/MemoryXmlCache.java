@@ -29,11 +29,19 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 
+/**
+ * XmlCache implementation which stores xml documents in memory
+ * @author sleepless
+ *
+ */
 public class MemoryXmlCache implements XmlCache {
     
     private DocumentBuilder dBuilder;
     private Map<String, Document> documents;
     
+    /**
+     * Creates a new MemoryXmlCache
+     */
     public MemoryXmlCache(){
         documents = new HashMap<String, Document>();
         try {
@@ -51,7 +59,7 @@ public class MemoryXmlCache implements XmlCache {
     }
 
     @Override
-    public Source getSource(String name) {
+    public Source createSource(String name) {
         Document doc = documents.get(name);
         if(doc == null) return null;
         return new DOMSource(doc);

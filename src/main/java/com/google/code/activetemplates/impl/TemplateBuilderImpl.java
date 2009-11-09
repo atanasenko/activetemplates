@@ -31,11 +31,11 @@ import javax.xml.transform.Source;
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateBuilder;
 import com.google.code.activetemplates.TemplateBuilderConfig;
-import com.google.code.activetemplates.Template.Access;
 import com.google.code.activetemplates.cache.MemoryXmlCache;
 import com.google.code.activetemplates.cache.XmlCache;
 import com.google.code.activetemplates.def.TemplateDefinition;
 import com.google.code.activetemplates.def.TemplateDefinitionSource;
+import com.google.code.activetemplates.impl.TemplateImpl.Access;
 import com.google.code.activetemplates.tiles.TileSource;
 import com.google.code.activetemplates.util.deps.DependencyNode;
 import com.google.code.activetemplates.util.deps.DependencyTree;
@@ -141,7 +141,7 @@ public class TemplateBuilderImpl implements TemplateBuilder {
                     
                     for(Map.Entry<String, String> e: t.getInclusions().entrySet()) {
                         TemplateImpl incTemplate = templates.get(e.getValue());
-                        incSources.put(e.getKey(), incTemplate.getSource());
+                        incSources.put(e.getKey(), incTemplate.createSource());
                     }
                     new TemplateMerger(t.getName(), r, s, incSources).merge();
                     

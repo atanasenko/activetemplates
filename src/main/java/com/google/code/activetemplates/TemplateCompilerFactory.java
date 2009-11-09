@@ -18,15 +18,38 @@ package com.google.code.activetemplates;
 
 import com.google.code.activetemplates.spi.Providers;
 
+/**
+ * Factory for template compilers
+ * 
+ * @author sleepless
+ *
+ */
 public abstract class TemplateCompilerFactory {
     
+    /**
+     * Returns a new default TemplateCompilerFactory
+     * 
+     * @return
+     */
     public final static TemplateCompilerFactory newInstance(){
         return Providers.getTemplateSPI().getCompilerFactory();
     }
+    
+    /**
+     * Returns a new templateCompilerFactory provided by the specified provider.
+     * 
+     * @param provider
+     * @return
+     */
     public final static TemplateCompilerFactory newInstance(String provider){
         return Providers.getTemplateSPI(provider).getCompilerFactory();
     }
     
-    public abstract TemplateCompiler createCompiler();
+    /**
+     * Creates a new compiler
+     * 
+     * @return
+     */
+    public abstract TemplateCompiler createCompiler(TemplateCompilerConfig conf);
 
 }

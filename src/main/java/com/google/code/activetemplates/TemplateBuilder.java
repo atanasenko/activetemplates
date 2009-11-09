@@ -18,8 +18,19 @@ package com.google.code.activetemplates;
 
 import java.util.List;
 
+/**
+ * Builder for template instances
+ * 
+ * @author sleepless
+ *
+ */
 public interface TemplateBuilder {
 
+    /**
+     * Builds and returns a new template instance
+     * 
+     * @return
+     */
     public List<Template> build();
     
 }

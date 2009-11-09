@@ -30,7 +30,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 
-import com.google.code.activetemplates.Bindings;
+import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeEvent;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;

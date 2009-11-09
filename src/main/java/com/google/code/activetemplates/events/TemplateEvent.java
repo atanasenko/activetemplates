@@ -21,7 +21,7 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.Bindings;
+import com.google.code.activetemplates.bind.Bindings;
 
 public interface TemplateEvent {
 

@@ -27,16 +27,29 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+/**
+ * XmlCache implementation which stores documents as files.
+ * 
+ * @author sleepless
+ *
+ */
 public class FileXmlCache implements XmlCache {
     
     private File dir;
     
     private Map<String, File> files;
 
+    /**
+     * Creates a new FileXmlCache which stores xml documents in temporary folder
+     */
     public FileXmlCache() {
         this(null);
     }
     
+    /**
+     * Creates a new FileXmlCache which stores xml documents under specified directory
+     * @param f
+     */
     public FileXmlCache(File f) {
         files = new HashMap<String, File>();
         this.dir = f;
@@ -82,7 +95,7 @@ public class FileXmlCache implements XmlCache {
     }
 
     @Override
-    public Source getSource(String name) {
+    public Source createSource(String name) {
         File f = files.get(name);
         if(f == null) return null;
         return new StreamSource(f);
