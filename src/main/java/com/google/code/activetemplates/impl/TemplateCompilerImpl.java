@@ -87,7 +87,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
         try {
             
-            CompileContext ctx = new CompileContext(r, w, eFactory, b);
+            CompileContext ctx = new CompileContext(r, w, eFactory, script, b);
             
             doCompile(ctx);
             
@@ -101,8 +101,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     
     @Override
     public Bindings createBindings() {
-        // TODO Auto-generated method stub
-        return null;
+        return script.createBindings();
     }
 
     private void doCompile(CompileContext cc) throws XMLStreamException {

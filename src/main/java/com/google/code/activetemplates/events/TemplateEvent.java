@@ -22,6 +22,7 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
+import com.google.code.activetemplates.script.ScriptingProvider;
 
 public interface TemplateEvent {
 
@@ -32,6 +33,8 @@ public interface TemplateEvent {
     public XMLEventReader getEventReader();
     
     public XMLEventFactory getElementFactory();
+    
+    public ScriptingProvider getScriptingProvider();
     
     public Bindings getBindings();
     

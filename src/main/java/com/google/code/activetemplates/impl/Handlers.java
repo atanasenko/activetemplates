@@ -38,6 +38,7 @@ import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
 import com.google.code.activetemplates.events.TemplateEvent;
 import com.google.code.activetemplates.events.ElementHandler.Outcome;
+import com.google.code.activetemplates.script.ScriptingProvider;
 import com.google.code.activetemplates.spi.HandlerSPI;
 import com.google.code.activetemplates.spi.Providers;
 
@@ -134,6 +135,10 @@ public class Handlers {
 
         public XMLEventFactory getElementFactory() {
             return cc.getElementFactory();
+        }
+        
+        public ScriptingProvider getScriptingProvider(){
+            return cc.getScriptingProvider();
         }
         
         public XMLEvent getEvent(){
