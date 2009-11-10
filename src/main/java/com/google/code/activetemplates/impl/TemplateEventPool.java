@@ -16,16 +16,18 @@
 
 package com.google.code.activetemplates.impl;
 
-import org.apache.commons.pool.KeyedObjectPool;
 import org.apache.commons.pool.KeyedPoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericKeyedObjectPool;
 
 class TemplateEventPool {
 
-    private KeyedObjectPool pool;
+    private GenericKeyedObjectPool pool;
     
     public TemplateEventPool(){
         pool = new GenericKeyedObjectPool(new TemplateEventFactory());
+        pool.setMaxIdle(100);
+        pool.setMinIdle(25);
+        pool.setMinEvictableIdleTimeMillis(5000);
     }
     
     public AttributeEventImpl borrowAttributeEvent(){
