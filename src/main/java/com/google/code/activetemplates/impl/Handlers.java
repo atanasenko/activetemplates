@@ -21,30 +21,22 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 
 
-import com.google.code.activetemplates.bind.Bindings;
-import com.google.code.activetemplates.events.AttributeEvent;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
-import com.google.code.activetemplates.events.EndElementEvent;
-import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.events.TemplateEvent;
 import com.google.code.activetemplates.events.ElementHandler.Outcome;
-import com.google.code.activetemplates.script.ScriptingProvider;
 import com.google.code.activetemplates.spi.HandlerSPI;
 import com.google.code.activetemplates.spi.Providers;
 
-public class Handlers {
+class Handlers {
     
     private Map<QName, AttributeHandler> attributes;
     private Map<QName, ElementHandler> elements;
+    private TemplateEventPool eventPool;
     
     public Handlers(){
         
@@ -66,6 +58,7 @@ public class Handlers {
         
         this.attributes = attributes;
         this.elements = elements;
+        eventPool = new TemplateEventPool();
     }
     
     public boolean isAttributeHandled(QName name){
@@ -76,105 +69,52 @@ public class Handlers {
         return elements.containsKey(name);
     }
     
-    public AttributeHandler.Outcome preProcessAttribute(CompileContext cc, Attribute attr) {
+    public AttributeHandler.Outcome processAttribute(CompileContext cc, Attribute attr) {
         AttributeHandler h = attributes.get(attr.getName());
         if(h == null) throw new IllegalStateException("Attribute " + attr.getName() + " is not handled");
-        AttributeHandler.Outcome o = h.preProcessAttribute(new AttributeEventImpl(cc, attr));
-        return o != null ? o : AttributeHandler.Outcome.PROCESS_ALL;
-    }
-    
-    public void postProcessAttribute(CompileContext cc, Attribute attr) {
-        AttributeHandler h = attributes.get(attr.getName());
-        if(h == null) throw new IllegalStateException("Attribute " + attr.getName() + " is not handled");
-        h.postProcessAttribute(new AttributeEventImpl(cc, attr));
+        AttributeEventImpl ev = eventPool.borrowAttributeEvent();
+        ev.init(cc, attr);
+        try {
+            AttributeHandler.Outcome o = h.processAttribute(ev);
+            return o != null ? o : AttributeHandler.Outcome.PROCESS_ALL;
+        } finally {
+            eventPool.returnAttributeEvent(ev);
+        }
     }
     
     public ElementHandler.Outcome processStartElement(CompileContext cc, StartElement el) {
         ElementHandler h = elements.get(el.getName());
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
-        ElementHandler.Outcome o = h.processStart(new StartElementEventImpl(cc, el));
-        if(o == Outcome.PROCESS_PARENT) {
-            throw new IllegalStateException(o + " may not be returned from start element");
+        
+        StartElementEventImpl ev = eventPool.borrowStartElementEvent();
+        ev.init(cc, el);
+        
+        try {
+            ElementHandler.Outcome o = h.processStart(ev);
+            if(o == Outcome.PROCESS_PARENT) {
+                throw new IllegalStateException(o + " may not be returned from start element");
+            }
+            return o != null ? o : Outcome.PROCESS_CHILDREN;
+        } finally {
+            eventPool.returnStartElementEvent(ev);
         }
-        return o != null ? o : Outcome.PROCESS_CHILDREN;
     }
 
     public ElementHandler.Outcome processEndElement(CompileContext cc, EndElement el) {
         ElementHandler h = elements.get(el.getName());
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
-        ElementHandler.Outcome o = h.processEnd(new EndElementEventImpl(cc, el));
-        if(o == Outcome.PROCESS_CHILDREN) {
-            throw new IllegalStateException(o + " may not be returned from end element");
-        }
-        return o != null ? o : Outcome.PROCESS_SIBLINGS;
-    }
-    
-    private abstract class EventImpl implements TemplateEvent {
         
-        private CompileContext cc;
-        private XMLEvent e;
+        EndElementEventImpl ev = eventPool.borrowEndElementEvent();
+        ev.init(cc, el);
         
-        EventImpl(CompileContext cc, XMLEvent e) {
-            this.cc = cc;
-            this.e = e;
-        }
-
-        public Bindings getBindings() {
-            return cc.getBindings();
-        }
-
-        public XMLEventReader getEventReader() {
-            return cc.getReader();
-        }
-
-        public XMLEventFactory getEventFactory() {
-            return cc.getElementFactory();
-        }
-        
-        public ScriptingProvider getScriptingProvider(){
-            return cc.getScriptingProvider();
-        }
-        
-        public void pushEvent(XMLEvent event) {
-            cc.getEventQueue().offer(event);
-        }
-
-        public XMLEvent getEvent(){
-            return e;
-        }
-
-    }
-    
-    private class AttributeEventImpl extends EventImpl implements AttributeEvent {
-        
-        AttributeEventImpl(CompileContext cc, Attribute e) {
-            super(cc, e);
-        }
-
-        @Override
-        public Attribute getEvent() {
-            return (Attribute) super.getEvent();
+        try {
+            ElementHandler.Outcome o = h.processEnd(ev);
+            if(o == Outcome.PROCESS_CHILDREN) {
+                throw new IllegalStateException(o + " may not be returned from end element");
+            }
+            return o != null ? o : Outcome.PROCESS_SIBLINGS;
+        } finally {
+            eventPool.returnEndElementEvent(ev);
         }
     }
-    
-    private class StartElementEventImpl extends EventImpl implements StartElementEvent {
-
-        StartElementEventImpl(CompileContext cc, StartElement e) {
-            super(cc, e);
-        }
-        
-        public StartElement getEvent() {
-            return super.getEvent().asStartElement();
-        }
-    }
-    
-    private class EndElementEventImpl extends EventImpl implements EndElementEvent {
-
-        EndElementEventImpl(CompileContext cc, EndElement e) {
-            super(cc, e);
-        }
-        
-        public EndElement getEvent() {
-            return super.getEvent().asEndElement();
-        }
-    }}
+}

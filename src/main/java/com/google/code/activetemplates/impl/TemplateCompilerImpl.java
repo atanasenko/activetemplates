@@ -131,8 +131,6 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 Iterator<Attribute> it = se.getAttributes();
                 
                 boolean attributesHandled = false;
-
-                List<Attribute> processed = new ArrayList<Attribute>();
                 List<Attribute> unprocessed = new ArrayList<Attribute>();
                 
                 // preprocess attributes
@@ -148,21 +146,20 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     }
                     
                     if(h.isAttributeHandled(a.getName())) {
-                        processed.add(a);
 
                         attributesHandled = true;
-                        AttributeHandler.Outcome o = h.preProcessAttribute(cc, a);
+                        AttributeHandler.Outcome o = h.processAttribute(cc, a);
                         
                         switch(o) {
+                        case PROCESS_ALL:
+                            break;
+                            
                         case PROCESS_TAG:
                             break cycle_attr;
                             
                         case PROCESS_NONE:
                             skipChildren(cc, false);
                             break if_tag;
-                            
-                        case PROCESS_ALL:
-                            break;
                         }
                         
                     } else {
@@ -189,14 +186,6 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 } else {
                     cc.getWriter().add(e);
                 }
-                
-                // postprocess attributes
-                for(Attribute a: processed) {
-                    
-                    h.postProcessAttribute(cc, a);
-                    
-                }
-                
                 
             } else if(e.isEndElement()) {
                 

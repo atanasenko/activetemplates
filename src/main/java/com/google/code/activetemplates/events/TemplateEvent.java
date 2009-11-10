@@ -24,7 +24,10 @@ import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.script.ScriptingProvider;
 
 /**
- * Base for all template events
+ * Base interface for all template events.
+ * 
+ * Note that TemplateEvent instances might be cached internally, so they
+ * should not be used outside of corresponding process method.
  * 
  * @author sleepless
  *

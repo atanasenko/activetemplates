@@ -17,14 +17,7 @@
 package com.google.code.activetemplates.events;
 
 /**
- * Contract for attribute handlers.
- * 
- * Attribute handling is done twice: 
- * 1. preProcessAttribute method is called before start element handler is 
- * called and one can decide over the outcome of the processing.
- * 
- * 2. postProcessAttribute method is called after start element handler was
- * called
+ * Attribute event handler
  * 
  * @author sleepless
  *
@@ -32,7 +25,7 @@ package com.google.code.activetemplates.events;
 public interface AttributeHandler {
 
     /**
-     * Defines the outcome of attribute preprocessing
+     * Defines the outcome of attribute processing
      * 
      * @author sleepless
      *
@@ -50,27 +43,21 @@ public interface AttributeHandler {
         PROCESS_TAG,
         
         /**
-         * Skips processing the tag and its children
+         * Skips processing the tag and its children.
+         * Tags start element handler will not be called
          */
         PROCESS_NONE;
     }
     
     /**
-     * Preprocess phase of attribute event.
+     * Process attribute event.
      * Called after start element was read from eventReader and before
      * its processing commences.
      * 
      * @param attr
      * @return
      */
-    public Outcome preProcessAttribute(AttributeEvent attr);
+    public Outcome processAttribute(AttributeEvent attr);
     
-    /**
-     * Postprocess phase of attribute event.
-     * Called after start element processing finishes
-     * 
-     * @param attr
-     */
-    public void postProcessAttribute(AttributeEvent attr);
     
 }
