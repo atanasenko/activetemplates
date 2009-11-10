@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -106,12 +107,19 @@ public class TemplateCompilerImpl implements TemplateCompiler {
 
     private void doCompile(CompileContext cc) throws XMLStreamException {
         
-        while(cc.getReader().hasNext()) {
-            
+        Queue<XMLEvent> q = cc.getEventQueue();
+        XMLEventReader r = cc.getReader();
+        
+        if(r.hasNext()) {
+            q.offer(r.nextEvent());
+        }
+        
+        while(q.size() > 0) {
+
             XMLEvent e = cc.getEventQueue().poll();
-            
-            if(e == null) {
-                e = cc.getReader().nextEvent();
+
+            if(q.size() == 0 && r.hasNext()) {
+                q.offer(r.nextEvent());
             }
             
             if_tag:
@@ -153,7 +161,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                             skipChildren(cc, false);
                             break if_tag;
                             
-                        case PROCESS_ATTRIBUTES:
+                        case PROCESS_ALL:
                             break;
                         }
                         
@@ -219,7 +227,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 }
                 cc.getWriter().add(ce);
                 
-            } 
+            }
+            
         }
         
     }

@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.lib.elements.Container;
 import com.google.code.activetemplates.lib.elements.If;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
@@ -35,6 +36,7 @@ public class StandardHandlerSPI implements HandlerSPI {
     static {
         
         elements.put(If.TAG, new If());
+        elements.put(Container.TAG, new Container());
         
     }
 

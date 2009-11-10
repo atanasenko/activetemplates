@@ -18,6 +18,11 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.events.EndElement;
 
+/**
+ * End element event wrapper
+ * @author sleepless
+ *
+ */
 public interface EndElementEvent extends TemplateEvent {
 
     public EndElement getEvent();

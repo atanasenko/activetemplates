@@ -38,7 +38,7 @@ public class TemplateMerger {
         new QName(TemplateConstants.NAMESPACE_STDLIB, "include");
     
     private static final QName ATTR_NAME = 
-        new QName(TemplateConstants.NAMESPACE_STDLIB, "name");
+        new QName("name");
     
     private String tName;
     private Result res;

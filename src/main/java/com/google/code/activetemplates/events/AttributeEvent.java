@@ -18,6 +18,11 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.events.Attribute;
 
+/**
+ * Attribute xml event wrapper
+ * @author sleepless
+ *
+ */
 public interface AttributeEvent extends TemplateEvent {
 
     public Attribute getEvent();

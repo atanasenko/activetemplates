@@ -18,24 +18,57 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.script.ScriptingProvider;
 
+/**
+ * Base for all template events
+ * 
+ * @author sleepless
+ *
+ */
 public interface TemplateEvent {
 
+    /**
+     * Returns xml event associated with the current template event
+     * @return
+     */
     public XMLEvent getEvent();
     
-    public XMLEventWriter getEventWriter();
-    
+    /**
+     * Returns XMLEventReader for template source
+     * 
+     * @return
+     */
     public XMLEventReader getEventReader();
     
-    public XMLEventFactory getElementFactory();
+    /**
+     * Returns generic XMLEventFactory
+     * @return
+     */
+    public XMLEventFactory getEventFactory();
     
+    /**
+     * Pushes xml event onto event queue that will be processed before next event
+     * would be read from XMLEventReader 
+     * @param event
+     */
+    public void pushEvent(XMLEvent event);
+    
+    /**
+     * Returns scripting provider instance associated with current compiling
+     * context.
+     * 
+     * @return
+     */
     public ScriptingProvider getScriptingProvider();
     
+    /**
+     * Returns bindings for scripting provider
+     * @return
+     */
     public Bindings getBindings();
     
 }

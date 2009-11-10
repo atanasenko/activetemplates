@@ -23,7 +23,6 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
@@ -81,7 +80,7 @@ public class Handlers {
         AttributeHandler h = attributes.get(attr.getName());
         if(h == null) throw new IllegalStateException("Attribute " + attr.getName() + " is not handled");
         AttributeHandler.Outcome o = h.preProcessAttribute(new AttributeEventImpl(cc, attr));
-        return o != null ? o : AttributeHandler.Outcome.PROCESS_ATTRIBUTES;
+        return o != null ? o : AttributeHandler.Outcome.PROCESS_ALL;
     }
     
     public void postProcessAttribute(CompileContext cc, Attribute attr) {
@@ -121,19 +120,14 @@ public class Handlers {
         }
 
         public Bindings getBindings() {
-            // TODO
-            return null;
+            return cc.getBindings();
         }
 
         public XMLEventReader getEventReader() {
             return cc.getReader();
         }
 
-        public XMLEventWriter getEventWriter() {
-            return cc.getWriter();
-        }
-
-        public XMLEventFactory getElementFactory() {
+        public XMLEventFactory getEventFactory() {
             return cc.getElementFactory();
         }
         
@@ -141,6 +135,10 @@ public class Handlers {
             return cc.getScriptingProvider();
         }
         
+        public void pushEvent(XMLEvent event) {
+            cc.getEventQueue().offer(event);
+        }
+
         public XMLEvent getEvent(){
             return e;
         }

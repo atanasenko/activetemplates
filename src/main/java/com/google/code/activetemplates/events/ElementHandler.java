@@ -16,16 +16,59 @@
 
 package com.google.code.activetemplates.events;
 
+/**
+ * Handler of start/end element event pair
+ * 
+ * @author sleepless
+ *
+ */
 public interface ElementHandler {
     
+    /**
+     * Outcome of element processing
+     * 
+     * @author sleepless
+     */
     public enum Outcome {
+        
+        /**
+         * Continue with processing current element children
+         * 
+         * May only be returned from processStart
+         */
         PROCESS_CHILDREN,
+        
+        /**
+         * Continue with processing current element's children.
+         * 
+         * Skips any children if returned from processStart
+         */
         PROCESS_SIBLINGS,
+        
+        /**
+         * Skips processing any siblings and process parent element's end.
+         * 
+         * May only be returned from processEnd
+         */
         PROCESS_PARENT;
     }
     
+    /**
+     * Processes start element.
+     * Possible outcomes: PROCESS_CHILDREN, PROCESS_SIBLINGS
+     * 
+     * @param e
+     * @return
+     */
     public Outcome processStart(StartElementEvent e);
     
+    /**
+     * Processes end element.
+     * Possible outcomes: PROCESS_SIBLINGS, PROCESS_PARENT
+     * 
+     * @param e
+     * @return
+     */
     public Outcome processEnd(EndElementEvent e);
     
 }

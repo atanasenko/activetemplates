@@ -18,6 +18,11 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.events.StartElement;
 
+/**
+ * Start element event wrapper
+ * @author sleepless
+ *
+ */
 public interface StartElementEvent extends TemplateEvent {
 
     public StartElement getEvent();
