@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.impl;
+package com.google.code.activetemplates.lib.bind;
 
+import com.google.code.activetemplates.bind.BindingResolutionException;
+import com.google.code.activetemplates.bind.BindingResolver;
+import com.google.code.activetemplates.bind.Bindings;
 
-import com.google.code.activetemplates.TemplateBuilderFactory;
-import com.google.code.activetemplates.TemplateCompilerFactory;
-import com.google.code.activetemplates.spi.TemplateSPI;
+public class Clazz implements BindingResolver {
 
-public class DefaultProvider implements TemplateSPI {
+    public static final String PREFIX = "class";
 
-    @Override
-    public TemplateCompilerFactory getCompilerFactory() {
-        return new TemplateCompilerFactoryImpl();
-    }
-
-    @Override
-    public TemplateBuilderFactory getBuilderFactory() {
-        return new TemplateBuilderFactoryImpl();
-    }
-
-    @Override
-    public String getProviderName() {
-        return "default";
+    public Object resolve(String value, Bindings b) {
+        try {
+            return Class.forName(value);
+        } catch(Exception e) {
+            throw new BindingResolutionException(e);
+        }
     }
 
 }

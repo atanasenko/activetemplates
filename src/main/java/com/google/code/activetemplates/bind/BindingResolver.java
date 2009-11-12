@@ -33,6 +33,6 @@ public interface BindingResolver {
      * @param b
      * @return
      */
-    public Object resolve(String value, Bindings b);
+    public Object resolve(String value, Bindings b) throws BindingResolutionException;
     
 }

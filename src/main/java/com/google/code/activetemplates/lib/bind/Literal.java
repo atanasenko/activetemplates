@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.spi;
+package com.google.code.activetemplates.lib.bind;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.code.activetemplates.bind.BindingResolver;
+import com.google.code.activetemplates.bind.Bindings;
 
-import javax.xml.namespace.QName;
+public class Literal implements BindingResolver {
+    
+    public static final String PREFIX = "literal";
 
-import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.events.ElementHandler;
+    public Object resolve(String value, Bindings b) {
+        return value;
+    }
 
-public interface HandlerSPI {
-    
-    public Map<QName, AttributeHandler> getAttributeHandlers();
-    
-    public Map<QName, ElementHandler> getElementHandlers();
-    
-    public Set<String> getExcludedNamespaces();
-    
-    public String getProvider();
-    
 }

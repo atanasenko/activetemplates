@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.spi;
+package com.google.code.activetemplates.bind;
 
-import java.util.Map;
-import java.util.Set;
+public class BindingResolutionException extends RuntimeException {
 
-import javax.xml.namespace.QName;
+    private static final long serialVersionUID = 1L;
 
-import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.events.ElementHandler;
+    public BindingResolutionException() {
+        super();
+    }
 
-public interface HandlerSPI {
-    
-    public Map<QName, AttributeHandler> getAttributeHandlers();
-    
-    public Map<QName, ElementHandler> getElementHandlers();
-    
-    public Set<String> getExcludedNamespaces();
-    
-    public String getProvider();
+    public BindingResolutionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BindingResolutionException(String message) {
+        super(message);
+    }
+
+    public BindingResolutionException(Throwable cause) {
+        super(cause);
+    }
     
 }

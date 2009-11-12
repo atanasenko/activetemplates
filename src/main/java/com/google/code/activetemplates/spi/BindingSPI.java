@@ -16,15 +16,13 @@
 
 package com.google.code.activetemplates.spi;
 
-import java.util.Collection;
+import java.util.Map;
 
 import com.google.code.activetemplates.bind.BindingResolver;
 
 public interface BindingSPI {
     
-    public Collection<String> getSupportedBindingsPrefixes();
-    
-    public BindingResolver createResolver(String name);
+    public Map<String, BindingResolver> getResolvers();
     
     public String getProviderName();
     

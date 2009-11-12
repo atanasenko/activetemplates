@@ -32,7 +32,7 @@ import com.google.code.activetemplates.lib.elements.Container;
 import com.google.code.activetemplates.lib.elements.If;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
-public class StandardHandlerSPI implements HandlerSPI {
+public class DefaultHandlerSPI implements HandlerSPI {
     
     public static final String NAMESPACE_STDLIB = 
         "http://code.google.com/p/activetemplates/ns/stdlib";
@@ -42,7 +42,6 @@ public class StandardHandlerSPI implements HandlerSPI {
     private static final Set<String> excludedNamespaces = new HashSet<String>();
     
     static {
-        
         elements.put(If.TAG, new If());
         elements.put(Container.TAG, new Container());
         
@@ -51,19 +50,20 @@ public class StandardHandlerSPI implements HandlerSPI {
         excludedNamespaces.add(NAMESPACE_STDLIB);
     }
 
-    @Override
     public Map<QName, AttributeHandler> getAttributeHandlers() {
         return Collections.unmodifiableMap(attributes);
     }
 
-    @Override
     public Map<QName, ElementHandler> getElementHandlers() {
         return Collections.unmodifiableMap(elements);
     }
 
-    @Override
     public Set<String> getExcludedNamespaces() {
         return Collections.unmodifiableSet(excludedNamespaces);
+    }
+    
+    public String getProvider(){
+        return "default";
     }
 
 }

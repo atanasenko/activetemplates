@@ -22,7 +22,7 @@ import javax.xml.stream.events.Attribute;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.impl.handlers.StandardHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 /**
  * Processes element children only if name attribute evaluates to true
@@ -32,7 +32,7 @@ import com.google.code.activetemplates.impl.handlers.StandardHandlerSPI;
  */
 public class If implements ElementHandler {
     
-    public static final QName TAG = new QName(StandardHandlerSPI.NAMESPACE_STDLIB, "if");
+    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
     
     private static final QName ATTR_CONDITION = new QName("condition");
 
