@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.spi;
+package com.google.code.activetemplates.script;
 
-import java.util.Map;
-import java.util.Set;
+import com.google.code.activetemplates.bind.Bindings;
 
-import javax.xml.namespace.QName;
+/**
+ * Compiled script
+ * 
+ * @author sleepless
+ *
+ */
+public interface CompiledScript {
 
-import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.events.ElementHandler;
-
-public interface HandlerSPI {
-    
-    public Map<QName, AttributeHandler> getAttributeHandlers();
-    
-    public Map<QName, ElementHandler> getElementHandlers();
-    
-    public Set<String> getExcludedNamespaces();
+    /**
+     * Executes this script against specified bindings
+     * 
+     * @param b
+     * @return
+     */
+    public Object exec(Bindings b);
     
 }

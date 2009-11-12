@@ -17,7 +17,7 @@
 package com.google.code.activetemplates.events;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
@@ -40,18 +40,25 @@ public interface TemplateEvent {
      */
     public XMLEvent getEvent();
     
-    /**
-     * Returns XMLEventReader for template source
-     * 
-     * @return
-     */
-    public XMLEventReader getEventReader();
     
     /**
      * Returns generic XMLEventFactory
      * @return
      */
     public XMLEventFactory getEventFactory();
+    
+    /**
+     * Whether or not reader or internal queue have any pending xml events
+     * @return
+     */
+    public boolean hasNextEvent();
+    
+    /**
+     * Returns next xml event from reader or internal queue
+     * @return
+     * @throws XMLStreamException
+     */
+    public XMLEvent nextEvent() throws XMLStreamException;
     
     /**
      * Pushes xml event onto event queue that will be processed before next event
@@ -73,5 +80,11 @@ public interface TemplateEvent {
      * @return
      */
     public Bindings getBindings();
+    
+    /**
+     * Sets new bindings for compilation process
+     * @param b
+     */
+    public void setBindings(Bindings b);
     
 }

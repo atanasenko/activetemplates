@@ -19,10 +19,10 @@ package com.google.code.activetemplates.lib.elements;
 import javax.xml.namespace.QName;
 import javax.xml.stream.events.Attribute;
 
-import com.google.code.activetemplates.TemplateConstants;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
+import com.google.code.activetemplates.impl.handlers.StandardHandlerSPI;
 
 /**
  * Processes element children only if name attribute evaluates to true
@@ -32,7 +32,7 @@ import com.google.code.activetemplates.events.StartElementEvent;
  */
 public class If implements ElementHandler {
     
-    public static final QName TAG = new QName(TemplateConstants.NAMESPACE_STDLIB, "if");
+    public static final QName TAG = new QName(StandardHandlerSPI.NAMESPACE_STDLIB, "if");
     
     private static final QName ATTR_CONDITION = new QName("condition");
 
@@ -42,7 +42,12 @@ public class If implements ElementHandler {
         Attribute a = e.getEvent().getAttributeByName(ATTR_CONDITION);
         v = a != null ? a.getValue() : null;
         
-        if(!Boolean.parseBoolean(v)) {
+        if(v == null) {
+            throw new IllegalStateException("Condition not specified");
+        }
+        
+        
+        if(!e.getScriptingProvider().evalBoolean(v, e.getBindings())) {
             return Outcome.PROCESS_SIBLINGS;
         }
         

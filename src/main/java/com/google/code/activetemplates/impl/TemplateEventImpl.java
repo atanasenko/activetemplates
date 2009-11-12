@@ -17,7 +17,7 @@
 package com.google.code.activetemplates.impl;
 
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
@@ -42,9 +42,9 @@ abstract class TemplateEventImpl implements TemplateEvent {
     public Bindings getBindings() {
         return cc.getBindings();
     }
-
-    public XMLEventReader getEventReader() {
-        return cc.getReader();
+    
+    public void setBindings(Bindings b) {
+        cc.setBindings(b);
     }
 
     public XMLEventFactory getEventFactory() {
@@ -55,8 +55,16 @@ abstract class TemplateEventImpl implements TemplateEvent {
         return cc.getScriptingProvider();
     }
     
-    public void pushEvent(XMLEvent event) {
-        cc.getEventQueue().offer(event);
+    public boolean hasNextEvent() {
+        return cc.hasNextEvent();
+    }
+
+    public XMLEvent nextEvent() throws XMLStreamException {
+        return cc.nextEvent();
+    }
+
+    public void pushEvent(XMLEvent e) {
+        cc.pushEvent(e);
     }
 
     public XMLEvent getEvent(){

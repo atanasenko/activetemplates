@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.spi;
+package com.google.code.activetemplates;
 
-import java.util.Map;
-import java.util.Set;
+public class TemplateCompileException extends Exception {
 
-import javax.xml.namespace.QName;
+    private static final long serialVersionUID = 1L;
 
-import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.events.ElementHandler;
+    public TemplateCompileException() {
+        super();
+    }
 
-public interface HandlerSPI {
-    
-    public Map<QName, AttributeHandler> getAttributeHandlers();
-    
-    public Map<QName, ElementHandler> getElementHandlers();
-    
-    public Set<String> getExcludedNamespaces();
-    
+    public TemplateCompileException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public TemplateCompileException(String message) {
+        super(message);
+    }
+
+    public TemplateCompileException(Throwable cause) {
+        super(cause);
+    }
+
 }

@@ -19,10 +19,13 @@ package com.google.code.activetemplates.impl;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
+import java.util.Map;
+import java.util.Set;
 
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -31,6 +34,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
@@ -39,12 +43,16 @@ import javax.xml.transform.stream.StreamResult;
 
 
 import com.google.code.activetemplates.Template;
+import com.google.code.activetemplates.TemplateCompileException;
 import com.google.code.activetemplates.TemplateCompiler;
 import com.google.code.activetemplates.TemplateCompilerConfig;
-import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.script.ScriptingAction;
+import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
+import com.google.code.activetemplates.spi.HandlerSPI;
+import com.google.code.activetemplates.spi.Providers;
 
 public class TemplateCompilerImpl implements TemplateCompiler {
     
@@ -53,6 +61,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     private XMLInputFactory inFactory;
     private XMLEventFactory eFactory;
     private Handlers h;
+    
+    private Set<String> excludedNamespaces;
     
     public TemplateCompilerImpl(TemplateCompilerConfig conf){
         script = conf.getScriptingProvider();
@@ -65,73 +75,103 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         eFactory = XMLEventFactory.newInstance();
         
         h = new Handlers();
+        
+        excludedNamespaces = new HashSet<String>();
+        List<HandlerSPI> spis = Providers.getHandlerSPIs();
+        
+        for(HandlerSPI spi: spis) {
+            Set<String> s = spi.getExcludedNamespaces();
+            if(s != null) {
+                excludedNamespaces.addAll(s);
+            }
+        }
+        
+
     }
 
     @Override
-    public void compile(Template t, Bindings b, OutputStream out) throws XMLStreamException {
-        compile(t, b, new StreamResult(out));
+    public void compile(Template t, Map<String, ?> map, OutputStream out) throws TemplateCompileException {
+        compile(t, map, new StreamResult(out));
     }
 
     @Override
-    public void compile(Template t, Bindings b, Writer out) throws XMLStreamException {
-        compile(t, b, new StreamResult(out));
+    public void compile(Template t, Map<String, ?> map, Writer out) throws TemplateCompileException {
+        compile(t, map, new StreamResult(out));
     }
 
     @Override
-    public void compile(Template t, Bindings b, Result out) throws XMLStreamException {
+    public void compile(final Template t, final Map<String, ?> map, Result out) throws TemplateCompileException {
         
-        TemplateImpl ti = (TemplateImpl) t;
+        final TemplateImpl ti = (TemplateImpl) t;
         
-        Source s = t.createSource();
-        XMLEventWriter w = outFactory.createXMLEventWriter(out);
-        XMLEventReader r = inFactory.createXMLEventReader(s);
-        
+        final Source s = t.createSource();
+        XMLEventReader r = null;
+        XMLEventWriter w = null;
         try {
+            r = inFactory.createXMLEventReader(s);
+            w = outFactory.createXMLEventWriter(out);
+            final XMLStreamException[] xe = new XMLStreamException[1];
+
+            final XMLEventReader fr = r;
+            final XMLEventWriter fw = w;
+            script.call(new ScriptingAction() {
+                public void call(ScriptingContext sc) {
+                    try {
+                        CompileContext ctx = new CompileContext(fr, fw, eFactory, script, sc, script.createBindings(sc));
+                        
+                        doCompile(t.getName(), ctx);
+                    } catch(XMLStreamException e) {
+                        xe[0] = e;
+                    }
+                }
+            });
             
-            CompileContext ctx = new CompileContext(r, w, eFactory, script, b);
-            
-            doCompile(ctx);
-            
+            if(xe[0] != null) {
+                throw xe[0];
+            }
+
+        } catch(XMLStreamException e) {
+            throw new TemplateCompileException(e);
         } finally {
             ti.getXmlCache().close(s);
-            w.close();
-            r.close();
+            if(r != null) try{ r.close(); } catch(XMLStreamException e){}
+            if(w != null) try{ w.close(); } catch(XMLStreamException e){}
         }
-        
     }
     
-    @Override
-    public Bindings createBindings() {
-        return script.createBindings();
-    }
-
-    private void doCompile(CompileContext cc) throws XMLStreamException {
+    private void doCompile(String name, CompileContext cc) throws XMLStreamException {
         
-        Queue<XMLEvent> q = cc.getEventQueue();
-        XMLEventReader r = cc.getReader();
-        
-        if(r.hasNext()) {
-            q.offer(r.nextEvent());
-        }
-        
-        while(q.size() > 0) {
+        while(cc.hasNextEvent()) {
 
-            XMLEvent e = cc.getEventQueue().poll();
+            XMLEvent e = cc.nextEvent();
 
-            if(q.size() == 0 && r.hasNext()) {
-                q.offer(r.nextEvent());
-            }
+            ScriptingContext sctx = cc.getScriptingContext();
+            Location loc = e.getLocation();
+            sctx.setLocation(name + ":" + loc.getLineNumber());
             
             if_tag:
             if(e.isStartElement()) {
                 
                 StartElement se = e.asStartElement();
                 
+                boolean replaceElement = false;
+                
+                @SuppressWarnings("unchecked")
+                Iterator<Namespace> nsit = se.getNamespaces();
+                List<Namespace> namespaces = new ArrayList<Namespace>();
+                
+                while(nsit.hasNext()) {
+                    Namespace ns = nsit.next();
+                    if(excludedNamespaces.contains(ns.getNamespaceURI())) {
+                        replaceElement = true;
+                    } else {
+                        namespaces.add(ns);
+                    }
+                }
+                
                 @SuppressWarnings("unchecked")
                 Iterator<Attribute> it = se.getAttributes();
-                
-                boolean attributesHandled = false;
-                List<Attribute> unprocessed = new ArrayList<Attribute>();
+                List<Attribute> attributes = new ArrayList<Attribute>();
                 
                 // preprocess attributes
                 cycle_attr:
@@ -142,12 +182,12 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     String nvalue = processText(cc, value);
                     if(nvalue != null) {
                         a = cc.getElementFactory().createAttribute(a.getName(), nvalue);
-                        attributesHandled = true;
+                        replaceElement = true;
                     }
                     
                     if(h.isAttributeHandled(a.getName())) {
 
-                        attributesHandled = true;
+                        replaceElement = true;
                         AttributeHandler.Outcome o = h.processAttribute(cc, a);
                         
                         switch(o) {
@@ -163,17 +203,22 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                         }
                         
                     } else {
-                        unprocessed.add(a);
+                        attributes.add(a);
                     }
                 }
                 
-                if(attributesHandled) {
-                    se = cc.getElementFactory().createStartElement(se.getName(), unprocessed.iterator(), se.getNamespaces());
+                if(replaceElement) {
+                    // replace element with new one
+                    se = cc.getElementFactory()
+                            .createStartElement(
+                                    se.getName(), 
+                                    attributes.iterator(), 
+                                    namespaces.iterator());
                 }
                 
                 // handle start element
-                if(h.isElementHandled(e.asStartElement().getName())) {
-                    ElementHandler.Outcome o = h.processStartElement(cc, e.asStartElement());
+                if(h.isElementHandled(se.getName())) {
+                    ElementHandler.Outcome o = h.processStartElement(cc, se);
                     
                     switch(o){ 
                     case PROCESS_SIBLINGS:
@@ -184,7 +229,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                         break;
                     }
                 } else {
-                    cc.getWriter().add(e);
+                    cc.getWriter().add(se);
                 }
                 
             } else if(e.isEndElement()) {
@@ -232,8 +277,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
         int num = 1;
         
-        while(cc.getReader().hasNext()) {
-            XMLEvent e = cc.getReader().nextEvent();
+        while(cc.hasNextEvent()) {
+            XMLEvent e = cc.nextEvent();
             
             if(e.isStartElement()) {
                 num++;
@@ -243,7 +288,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             
             if(num == 0) {
                 // queue end node to handle it later
-                if(processEnd) cc.getEventQueue().offer(e);
+                if(processEnd) cc.pushEvent(e);
                 break;
             }
             
@@ -256,8 +301,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
         int num = 2;
 
-        while(cc.getReader().hasNext()) {
-            XMLEvent e = cc.getReader().nextEvent();
+        while(cc.hasNextEvent()) {
+            XMLEvent e = cc.nextEvent();
             
             if(e.isStartElement()) {
                 num++;
@@ -267,7 +312,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             
             if(num == 0) {
                 // queue end node to handle it later
-                cc.getEventQueue().offer(e);
+                cc.pushEvent(e);
                 break;
             }
             

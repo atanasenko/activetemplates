@@ -18,11 +18,10 @@ package com.google.code.activetemplates;
 
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.Result;
-
-import com.google.code.activetemplates.bind.Bindings;
 
 /**
  * Template compiler takes a template and compiles it into target document
@@ -37,38 +36,31 @@ public interface TemplateCompiler {
      * Compiles template into specified outputStream.
      * 
      * @param t
-     * @param b
+     * @param map
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Bindings b, OutputStream out) throws XMLStreamException;
+    public void compile(Template t, Map<String, ?> map, OutputStream out) throws TemplateCompileException;
 
     /**
      * Compiles template into specified reader.
      * Compile method which takes OutputStream is preferrable to this one.
      * 
      * @param t
-     * @param b
+     * @param map
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Bindings b, Writer out) throws XMLStreamException;
+    public void compile(Template t, Map<String, ?> map, Writer out) throws TemplateCompileException;
 
     /**
      * Compiles template into specified xml Result.
      * 
      * @param t
-     * @param b
+     * @param map
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Bindings b, Result out) throws XMLStreamException;
-    
-    /**
-     * Creates a new Bindings object which can be populated with data and passed
-     * to the compile method.
-     * @return
-     */
-    public Bindings createBindings();
+    public void compile(Template t, Map<String, ?> map, Result out) throws TemplateCompileException;
     
 }

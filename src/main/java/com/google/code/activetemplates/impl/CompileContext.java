@@ -22,9 +22,11 @@ import java.util.Queue;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
+import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
 
 public class CompileContext {
@@ -33,22 +35,39 @@ public class CompileContext {
     private XMLEventWriter writer;
     private XMLEventFactory elementFactory;
     private ScriptingProvider script;
+    private ScriptingContext scriptingContext;
     private Bindings bindings;
     
     private Queue<XMLEvent> eventQueue;
 
-    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, Bindings b) {
+    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
         reader = r;
         writer = w;
         elementFactory = ef;
         script = sc;
+        scriptingContext = sctx;
         bindings = b;
         
         eventQueue = new LinkedList<XMLEvent>();
     }
 
+    /*
     public XMLEventReader getReader() {
         return reader;
+    }
+    */
+    
+    public boolean hasNextEvent(){
+        return eventQueue.size() > 0 || reader.hasNext();
+    }
+    
+    public XMLEvent nextEvent() throws XMLStreamException {
+        if(eventQueue.size() > 0) return eventQueue.poll();
+        return reader.nextEvent();
+    }
+    
+    public void pushEvent(XMLEvent e) {
+        eventQueue.offer(e);
     }
 
     public XMLEventWriter getWriter() {
@@ -67,8 +86,15 @@ public class CompileContext {
         return bindings;
     }
 
-    public Queue<XMLEvent> getEventQueue(){
-        return eventQueue;
+    public void setBindings(Bindings bindings) {
+        if(bindings == null) {
+            throw new NullPointerException("bindings");
+        }
+        this.bindings = bindings;
+    }
+
+    public ScriptingContext getScriptingContext() {
+        return scriptingContext;
     }
     
 }

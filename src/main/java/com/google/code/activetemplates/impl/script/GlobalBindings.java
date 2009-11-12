@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.script;
+package com.google.code.activetemplates.impl.script;
 
-import javax.script.Bindings;
+import org.mozilla.javascript.Scriptable;
 
-/**
- * Compiled script
- * 
- * @author sleepless
- *
- */
-public interface Script {
+class GlobalBindings extends RhinoBindings {
 
-    /**
-     * Executes this script against specified bindings
-     * 
-     * @param b
-     * @return
-     */
-    public Object exec(Bindings b);
-    
+    public GlobalBindings(Scriptable scope) {
+        super(null, scope, null);
+    }
+
+    @Override
+    protected boolean isAccessible() {
+        return false;
+    }
+
 }

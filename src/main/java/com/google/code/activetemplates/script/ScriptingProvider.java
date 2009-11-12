@@ -26,14 +26,21 @@ import com.google.code.activetemplates.bind.Bindings;
  *
  */
 public interface ScriptingProvider {
+    
+    /**
+     * Calls specified ScriptingAction providing ScriptingContext
+     * @param sa
+     */
+    public void call(ScriptingAction sa);
 
     /**
      * Creates new bindings object which maps key-value pairs
      * onto scripting context
      * 
+     * @param sc
      * @return
      */
-    public Bindings createBindings();
+    public Bindings createBindings(ScriptingContext sc);
     
     /**
      * Creates child bindings, which effectively causes a new scripting
@@ -74,9 +81,10 @@ public interface ScriptingProvider {
     /**
      * Compiles specified script to be later executed against bindings object
      * 
+     * @param sc
      * @param script
      * @return
      */
-    public Script compile(String script);
+    public CompiledScript compile(ScriptingContext sc, String script);
     
 }

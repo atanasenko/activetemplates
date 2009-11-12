@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.spi;
+package com.google.code.activetemplates.script;
 
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.namespace.QName;
-
-import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.events.ElementHandler;
-
-public interface HandlerSPI {
+/**
+ * Scripting action is provided a scripting context upon call
+ * @author sleepless
+ *
+ */
+public interface ScriptingAction {
     
-    public Map<QName, AttributeHandler> getAttributeHandlers();
-    
-    public Map<QName, ElementHandler> getElementHandlers();
-    
-    public Set<String> getExcludedNamespaces();
+    /**
+     * Call this scripting action
+     * @param ctx
+     */
+    public void call(ScriptingContext ctx);
     
 }

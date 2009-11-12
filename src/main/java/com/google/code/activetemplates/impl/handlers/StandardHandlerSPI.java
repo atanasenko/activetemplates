@@ -16,38 +16,54 @@
 
 package com.google.code.activetemplates.impl.handlers;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 
 
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.lib.attributes.IfAttr;
 import com.google.code.activetemplates.lib.elements.Container;
 import com.google.code.activetemplates.lib.elements.If;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
 public class StandardHandlerSPI implements HandlerSPI {
     
-    public static final Map<QName, AttributeHandler> attributes = new HashMap<QName, AttributeHandler>();
-    public static final Map<QName, ElementHandler> elements = new HashMap<QName, ElementHandler>();
+    public static final String NAMESPACE_STDLIB = 
+        "http://code.google.com/p/activetemplates/ns/stdlib";
+
+    private static final Map<QName, AttributeHandler> attributes = new HashMap<QName, AttributeHandler>();
+    private static final Map<QName, ElementHandler> elements = new HashMap<QName, ElementHandler>();
+    private static final Set<String> excludedNamespaces = new HashSet<String>();
     
     static {
         
         elements.put(If.TAG, new If());
         elements.put(Container.TAG, new Container());
         
+        attributes.put(IfAttr.ATTRIBUTE, new IfAttr());
+        
+        excludedNamespaces.add(NAMESPACE_STDLIB);
     }
 
     @Override
     public Map<QName, AttributeHandler> getAttributeHandlers() {
-        return attributes;
+        return Collections.unmodifiableMap(attributes);
     }
 
     @Override
     public Map<QName, ElementHandler> getElementHandlers() {
-        return elements;
+        return Collections.unmodifiableMap(elements);
+    }
+
+    @Override
+    public Set<String> getExcludedNamespaces() {
+        return Collections.unmodifiableSet(excludedNamespaces);
     }
 
 }
