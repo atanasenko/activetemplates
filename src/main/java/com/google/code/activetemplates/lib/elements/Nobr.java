@@ -27,7 +27,7 @@ import com.google.code.activetemplates.events.StartElementEvent;
 import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 /**
- * Causes next 'characters' element to be stripped of linebreaks at the beginning
+ * Causes next 'characters' element to be stripped of whitespaces at the beginning
  * @author sleepless
  *
  */
