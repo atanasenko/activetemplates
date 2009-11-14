@@ -27,12 +27,13 @@ package com.google.code.activetemplates.bind;
 public interface BindingResolver {
    
     /**
-     * Resolves passed value against specified bindings
+     * Resolves passed value against specified bindings context
      * 
+     * @param prefix
      * @param value
-     * @param b
+     * @param bc
      * @return
      */
-    public Object resolve(String value, Bindings b) throws BindingResolutionException;
+    public Object resolve(String prefix, String value, BindingContext bc) throws BindingResolutionException;
     
 }

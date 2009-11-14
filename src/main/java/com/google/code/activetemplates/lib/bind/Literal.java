@@ -16,14 +16,14 @@
 
 package com.google.code.activetemplates.lib.bind;
 
+import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.BindingResolver;
-import com.google.code.activetemplates.bind.Bindings;
 
 public class Literal implements BindingResolver {
     
     public static final String PREFIX = "literal";
 
-    public Object resolve(String value, Bindings b) {
+    public Object resolve(String prefix, String value, BindingContext bc) {
         return value;
     }
 

@@ -61,11 +61,18 @@ public interface TemplateEvent {
     public XMLEvent nextEvent() throws XMLStreamException;
     
     /**
-     * Pushes xml event onto event queue that will be processed before next event
+     * Returns but does not remove next xml event from reader or internal queue.
+     * @return
+     * @throws XMLStreamException
+     */
+    public XMLEvent peekEvent() throws XMLStreamException;
+
+    /**
+     * Adds xml event to event queue that will be processed before next event
      * would be read from XMLEventReader 
      * @param event
      */
-    public void pushEvent(XMLEvent event);
+    public void queueEvent(XMLEvent event);
     
     /**
      * Returns scripting provider instance associated with current compiling

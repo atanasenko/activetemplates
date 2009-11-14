@@ -16,9 +16,11 @@
 
 package com.google.code.activetemplates.impl;
 
+
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -41,13 +43,18 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 
-
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateCompileException;
 import com.google.code.activetemplates.TemplateCompiler;
 import com.google.code.activetemplates.TemplateCompilerConfig;
+import com.google.code.activetemplates.bind.BindingContext;
+import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.exp.CompoundExpansion;
+import com.google.code.activetemplates.exp.Expansion;
+import com.google.code.activetemplates.exp.ExpansionParser;
+import com.google.code.activetemplates.exp.StringExpansion;
 import com.google.code.activetemplates.script.ScriptingAction;
 import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
@@ -63,6 +70,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     private Handlers h;
     
     private Set<String> excludedNamespaces;
+    
+    private Map<String, Expansion> expansionCache;
     
     public TemplateCompilerImpl(TemplateCompilerConfig conf){
         script = conf.getScriptingProvider();
@@ -86,7 +95,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             }
         }
         
-
+        expansionCache = new HashMap<String, Expansion>();
     }
 
     @Override
@@ -117,7 +126,12 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             script.call(new ScriptingAction() {
                 public void call(ScriptingContext sc) {
                     try {
-                        CompileContext ctx = new CompileContext(fr, fw, eFactory, script, sc, script.createBindings(sc));
+                        Bindings b = script.createBindings(sc);
+                        for(Map.Entry<String, ?> e: map.entrySet()) {
+                            b.bind(e.getKey(), e.getValue());
+                        }
+                        
+                        CompileContext ctx = new CompileContext(fr, fw, eFactory, script, sc, b);
                         
                         doCompile(t.getName(), ctx);
                     } catch(XMLStreamException e) {
@@ -191,9 +205,6 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                         AttributeHandler.Outcome o = h.processAttribute(cc, a);
                         
                         switch(o) {
-                        case PROCESS_ALL:
-                            break;
-                            
                         case PROCESS_TAG:
                             break cycle_attr;
                             
@@ -222,10 +233,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     
                     switch(o){ 
                     case PROCESS_SIBLINGS:
-                        skipChildren(cc, false);
-                        break;
-
-                    case PROCESS_CHILDREN:
+                        skipChildren(cc, true);
                         break;
                     }
                 } else {
@@ -268,57 +276,87 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     }
     
     private String processText(CompileContext cc, String data) {
-        // TODO
-        return null;
+        
+        Expansion ex = expansionCache.get(data);
+        if(ex == null) {
+            
+            synchronized(expansionCache) {
+                ex = expansionCache.get(data);
+                if(ex == null) {
+                    try {
+                        ex = ExpansionParser.parse(data);
+                    } catch(Exception e) {
+                        throw new IllegalStateException("Error parsing:\n" + data, e);
+                    }
+                    
+                    // 
+                    boolean simple = true;
+                    if(ex instanceof CompoundExpansion) {
+                        CompoundExpansion ce = (CompoundExpansion) ex;
+                        for(Expansion e: ce.getExpansions()) {
+                            if(!(e instanceof StringExpansion)) {
+                                simple = false;
+                                break;
+                            }
+                        }
+                    }
+                    if(simple) {
+                        ex = DUMMY_EXPANSION;
+                    }
+                    
+                    expansionCache.put(data, ex);
+                }
+            }
+        }
+        
+        if(ex == DUMMY_EXPANSION)
+            return null;
+
+        StringBuilder sb = new StringBuilder();
+        ex.resolve(sb, cc.getBindingContext());
+        String val = sb.toString();
+        
+        if(val.equals(data))
+            return null;
+        
+        return val;
     }
     
     // skip all elements until current tag's end is encountered
     private static void skipChildren(CompileContext cc, boolean processEnd) throws XMLStreamException {
-        
-        int num = 1;
+        skipElements(cc, 1, processEnd);
+    }
+
+    // skip all elements until parent tag's end is encountered
+    private static void skipSiblings(CompileContext cc) throws XMLStreamException {
+        skipElements(cc, 2, true);
+    }
+    
+    // skip elements until level reaches 0
+    private static void skipElements(CompileContext cc, int initialLevel, boolean processEnd) throws XMLStreamException {
         
         while(cc.hasNextEvent()) {
-            XMLEvent e = cc.nextEvent();
+            XMLEvent e = cc.peekEvent();
             
             if(e.isStartElement()) {
-                num++;
+                initialLevel++;
             } else if(e.isEndElement()) {
-                num--;
+                initialLevel--;
             }
             
-            if(num == 0) {
-                // queue end node to handle it later
-                if(processEnd) cc.pushEvent(e);
+            if(initialLevel == 0) {
+                // do not remove the event if we need to process it later
+                if(!processEnd) cc.nextEvent();
                 break;
             }
+            cc.nextEvent();
             
         }
         
     }
     
-    // skip all elements unitl parent tag's end is encountered
-    private static void skipSiblings(CompileContext cc) throws XMLStreamException {
-        
-        int num = 2;
-
-        while(cc.hasNextEvent()) {
-            XMLEvent e = cc.nextEvent();
-            
-            if(e.isStartElement()) {
-                num++;
-            } else if(e.isEndElement()) {
-                num--;
-            }
-            
-            if(num == 0) {
-                // queue end node to handle it later
-                cc.pushEvent(e);
-                break;
-            }
-            
-        }
-        
-        
-    }
+    private static final Expansion DUMMY_EXPANSION = new Expansion() {
+        public void resolve(StringBuilder sb, BindingContext bc) {}
+    };
 
 }

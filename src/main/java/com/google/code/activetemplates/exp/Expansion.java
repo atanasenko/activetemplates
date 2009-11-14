@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.lib.bind;
+package com.google.code.activetemplates.exp;
 
 import com.google.code.activetemplates.bind.BindingContext;
-import com.google.code.activetemplates.bind.BindingResolutionException;
-import com.google.code.activetemplates.bind.BindingResolver;
 
-public class Clazz implements BindingResolver {
+public interface Expansion {
 
-    public static final String PREFIX = "class";
-
-    public Object resolve(String prefix, String value, BindingContext bc) {
-        try {
-            return Class.forName(value);
-        } catch(Exception e) {
-            throw new BindingResolutionException(e);
-        }
-    }
-
+    public void resolve(StringBuilder sb, BindingContext bc);
+    
 }

@@ -63,8 +63,12 @@ abstract class TemplateEventImpl implements TemplateEvent {
         return cc.nextEvent();
     }
 
-    public void pushEvent(XMLEvent e) {
-        cc.pushEvent(e);
+    public XMLEvent peekEvent() throws XMLStreamException {
+        return cc.peekEvent();
+    }
+
+    public void queueEvent(XMLEvent e) {
+        cc.queueEvent(e);
     }
 
     public XMLEvent getEvent(){

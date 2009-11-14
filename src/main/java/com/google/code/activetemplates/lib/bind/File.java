@@ -18,9 +18,9 @@ package com.google.code.activetemplates.lib.bind;
 
 import java.io.IOException;
 
+import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.BindingResolutionException;
 import com.google.code.activetemplates.bind.BindingResolver;
-import com.google.code.activetemplates.bind.Bindings;
 
 public class File implements BindingResolver {
 
@@ -29,7 +29,7 @@ public class File implements BindingResolver {
     private static final String CRE_PREFIX = "create:";
     
     @Override
-    public Object resolve(String value, Bindings b) {
+    public Object resolve(String prefix, String value, BindingContext bc) {
         boolean cre = false;
         if(value.startsWith(CRE_PREFIX)) {
             cre = true;

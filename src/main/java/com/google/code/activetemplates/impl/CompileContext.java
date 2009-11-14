@@ -25,6 +25,8 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+import com.google.code.activetemplates.bind.BindingContext;
+import com.google.code.activetemplates.bind.BindingResolverDelegate;
 import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
@@ -38,6 +40,8 @@ public class CompileContext {
     private ScriptingContext scriptingContext;
     private Bindings bindings;
     
+    private BindingContext bindingContext;
+    
     private Queue<XMLEvent> eventQueue;
 
     public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
@@ -46,9 +50,11 @@ public class CompileContext {
         elementFactory = ef;
         script = sc;
         scriptingContext = sctx;
-        bindings = b;
         
         eventQueue = new LinkedList<XMLEvent>();
+        
+        bindingContext = new BindingContext(script, new BindingResolverDelegate());
+        setBindings(b);
     }
 
     /*
@@ -66,7 +72,12 @@ public class CompileContext {
         return reader.nextEvent();
     }
     
-    public void pushEvent(XMLEvent e) {
+    public XMLEvent peekEvent() throws XMLStreamException {
+        if(eventQueue.size() > 0) return eventQueue.peek();
+        return reader.peek();
+    }
+    
+    public void queueEvent(XMLEvent e) {
         eventQueue.offer(e);
     }
 
@@ -85,12 +96,17 @@ public class CompileContext {
     public Bindings getBindings() {
         return bindings;
     }
+    
+    public BindingContext getBindingContext() {
+        return bindingContext;
+    }
 
     public void setBindings(Bindings bindings) {
         if(bindings == null) {
             throw new NullPointerException("bindings");
         }
         this.bindings = bindings;
+        bindingContext.setBindings(bindings);
     }
 
     public ScriptingContext getScriptingContext() {

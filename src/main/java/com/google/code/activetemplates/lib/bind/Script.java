@@ -17,19 +17,13 @@
 package com.google.code.activetemplates.lib.bind;
 
 import com.google.code.activetemplates.bind.BindingContext;
-import com.google.code.activetemplates.bind.BindingResolutionException;
 import com.google.code.activetemplates.bind.BindingResolver;
 
-public class Clazz implements BindingResolver {
-
-    public static final String PREFIX = "class";
+public class Script implements BindingResolver {
+    
+    public static final String PREFIX = "";
 
     public Object resolve(String prefix, String value, BindingContext bc) {
-        try {
-            return Class.forName(value);
-        } catch(Exception e) {
-            throw new BindingResolutionException(e);
-        }
+        return bc.getScriptingProvider().eval(value, bc.getBindings());
     }
-
 }

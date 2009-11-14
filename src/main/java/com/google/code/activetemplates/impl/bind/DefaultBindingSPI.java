@@ -25,6 +25,7 @@ import com.google.code.activetemplates.lib.bind.Clazz;
 import com.google.code.activetemplates.lib.bind.Dir;
 import com.google.code.activetemplates.lib.bind.File;
 import com.google.code.activetemplates.lib.bind.Literal;
+import com.google.code.activetemplates.lib.bind.Script;
 import com.google.code.activetemplates.spi.BindingSPI;
 
 public class DefaultBindingSPI implements BindingSPI {
@@ -33,6 +34,7 @@ public class DefaultBindingSPI implements BindingSPI {
     
     static {
         
+        resolvers.put(Script.PREFIX, new Script());
         resolvers.put(Clazz.PREFIX, new Clazz());
         resolvers.put(Dir.PREFIX, new Dir());
         resolvers.put(File.PREFIX, new File());
