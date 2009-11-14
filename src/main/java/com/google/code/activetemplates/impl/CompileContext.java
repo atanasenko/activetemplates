@@ -37,31 +37,31 @@ public class CompileContext {
     private XMLEventReader reader;
     private XMLEventWriter writer;
     private XMLEventFactory elementFactory;
+    
     private ScriptingProvider script;
     private ScriptingContext scriptingContext;
     private Deque<Bindings> bindingStack;
-    
     private BindingContext bindingContext;
     
     private Deque<XMLEvent> globalQueue;
     private Deque<XMLEvent> eventQueue;
     private ActionRegistry actionRegistry;
-
+    
     public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
-        reader = r;
-        writer = w;
+        reader         = r;
+        writer         = w;
         elementFactory = ef;
-        script = sc;
+        
+        script           = sc;
         scriptingContext = sctx;
-
-        bindingStack = new ArrayDeque<Bindings>();
-        globalQueue = new LinkedList<XMLEvent>();
-        eventQueue  = new LinkedList<XMLEvent>();
+        bindingStack     = new ArrayDeque<Bindings>();
+        bindingContext   = new BindingContext(script, new BindingResolverDelegate());
+        
+        globalQueue    = new LinkedList<XMLEvent>();
+        eventQueue     = new LinkedList<XMLEvent>();
         actionRegistry = new ActionRegistry();
         
-        bindingContext = new BindingContext(script, new BindingResolverDelegate());
         pushBindings(b);
-
     }
 
     public boolean hasNextEvent(){
