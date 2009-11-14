@@ -161,7 +161,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
 
             ScriptingContext sctx = cc.getScriptingContext();
             Location loc = e.getLocation();
-            sctx.setLocation(name + ":" + loc.getLineNumber());
+            sctx.setLocation(name + ":" + (loc == null ? "unknown" : loc.getLineNumber()));
             
             if_tag:
             if(e.isStartElement()) {
@@ -230,7 +230,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 // handle start element
                 if(h.isElementHandled(se.getName())) {
                     ElementHandler.Outcome o = h.processStartElement(cc, se);
-                    
+                    cc.flushEventQueue();
                     switch(o){ 
                     case PROCESS_SIBLINGS:
                         skipChildren(cc, true);
@@ -238,6 +238,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     }
                 } else {
                     cc.getWriter().add(se);
+                    cc.flushEventQueue(); // flush events added by any attribute handlers
                 }
                 
             } else if(e.isEndElement()) {
@@ -245,6 +246,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 // handle end element
                 if(h.isElementHandled(e.asEndElement().getName())) {
                     ElementHandler.Outcome o = h.processEndElement(cc, e.asEndElement());
+                    cc.flushEventQueue();
 
                     switch(o){ 
                     case PROCESS_PARENT:

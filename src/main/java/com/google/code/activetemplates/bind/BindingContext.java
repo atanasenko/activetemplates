@@ -27,13 +27,13 @@ public class BindingContext {
     
     private Bindings bindings;
     private ScriptingProvider scriptingProvider;
-    private BindingResolver bindingResolver;
+    private BindingResolverDelegate bindingResolver;
     
     /**
      * Creates new binding context
      * @param scriptingProvider
      */
-    public BindingContext(ScriptingProvider scriptingProvider, BindingResolver bindingResolver) {
+    public BindingContext(ScriptingProvider scriptingProvider, BindingResolverDelegate bindingResolver) {
         this.scriptingProvider = scriptingProvider;
         this.bindingResolver = bindingResolver;
     }
@@ -66,7 +66,7 @@ public class BindingContext {
      * Get binding resolver associated with this binding context
      * @return
      */
-    public BindingResolver getBindingResolver() {
+    public BindingResolverDelegate getBindingResolver() {
         return bindingResolver;
     }
 

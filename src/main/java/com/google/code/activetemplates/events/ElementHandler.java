@@ -16,6 +16,8 @@
 
 package com.google.code.activetemplates.events;
 
+import javax.xml.stream.XMLStreamException;
+
 /**
  * Handler of start/end element event pair
  * 
@@ -60,7 +62,7 @@ public interface ElementHandler {
      * @param e
      * @return
      */
-    public Outcome processStart(StartElementEvent e);
+    public Outcome processStart(StartElementEvent e) throws XMLStreamException;
     
     /**
      * Processes end element.
@@ -69,6 +71,6 @@ public interface ElementHandler {
      * @param e
      * @return
      */
-    public Outcome processEnd(EndElementEvent e);
+    public Outcome processEnd(EndElementEvent e) throws XMLStreamException;
     
 }

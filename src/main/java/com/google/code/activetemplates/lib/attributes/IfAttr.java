@@ -20,7 +20,9 @@ public class IfAttr implements AttributeHandler {
             throw new IllegalStateException("Condition not specified");
         }
         
-        if(!e.getScriptingProvider().evalBoolean(v, e.getBindings())) {
+        if(!e.getBindingContext()
+                .getScriptingProvider()
+                .evalBoolean(v, e.getBindingContext().getBindings())) {
             return Outcome.PROCESS_NONE;
         }
         

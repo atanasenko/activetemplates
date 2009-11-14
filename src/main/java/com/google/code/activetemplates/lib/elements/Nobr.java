@@ -17,7 +17,9 @@
 package com.google.code.activetemplates.lib.elements;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.events.Attribute;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Characters;
+import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
@@ -25,38 +27,29 @@ import com.google.code.activetemplates.events.StartElementEvent;
 import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 /**
- * Processes element children only if name attribute evaluates to true
- * 
+ * Causes next 'characters' element to be stripped of linebreaks at the beginning
  * @author sleepless
  *
  */
-public class If implements ElementHandler {
-    
-    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
-    
-    private static final QName ATTR_CONDITION = new QName("condition");
+public class Nobr implements ElementHandler {
+
+    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "nobr");
 
     public Outcome processStart(StartElementEvent e) {
-        
-        String v;
-        Attribute a = e.getEvent().getAttributeByName(ATTR_CONDITION);
-        v = a != null ? a.getValue() : null;
-        
-        if(v == null) {
-            throw new IllegalStateException("Condition not specified");
-        }
-        
-        
-        if(!e.getBindingContext()
-                .getScriptingProvider()
-                .evalBoolean(v, e.getBindingContext().getBindings())) {
-            return Outcome.PROCESS_SIBLINGS;
-        }
-        
         return null;
     }
 
-    public Outcome processEnd(EndElementEvent e) {
+    public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
+        XMLEvent ne = e.nextEvent();
+        
+        System.out.println("Next event: " + ne);
+        if(ne.isCharacters()) {
+            Characters c = ne.asCharacters();
+            String d = c.getData().replaceAll("^[\\s]*", "");
+            e.queueEvent(e.getEventFactory().createCharacters(d));
+        } else {
+            e.queueEvent(ne);
+        }
         return null;
     }
 

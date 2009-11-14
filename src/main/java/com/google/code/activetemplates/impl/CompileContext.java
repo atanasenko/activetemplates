@@ -19,7 +19,6 @@ package com.google.code.activetemplates.impl;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.Queue;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -45,7 +44,8 @@ public class CompileContext {
     
     private BindingContext bindingContext;
     
-    private Queue<XMLEvent> eventQueue;
+    private Deque<XMLEvent> globalQueue;
+    private Deque<XMLEvent> eventQueue;
     private ActionRegistry actionRegistry;
 
     public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
@@ -56,7 +56,8 @@ public class CompileContext {
         scriptingContext = sctx;
 
         bindingStack = new ArrayDeque<Bindings>();
-        eventQueue = new LinkedList<XMLEvent>();
+        globalQueue = new LinkedList<XMLEvent>();
+        eventQueue  = new LinkedList<XMLEvent>();
         actionRegistry = new ActionRegistry();
         
         bindingContext = new BindingContext(script, new BindingResolverDelegate());
@@ -64,28 +65,29 @@ public class CompileContext {
 
     }
 
-    /*
-    public XMLEventReader getReader() {
-        return reader;
-    }
-    */
-    
     public boolean hasNextEvent(){
-        return eventQueue.size() > 0 || reader.hasNext();
+        return globalQueue.size() > 0 || reader.hasNext();
     }
     
     public XMLEvent nextEvent() throws XMLStreamException {
-        if(eventQueue.size() > 0) return eventQueue.poll();
+        if(globalQueue.size() > 0) return globalQueue.poll();
         return reader.nextEvent();
     }
     
     public XMLEvent peekEvent() throws XMLStreamException {
-        if(eventQueue.size() > 0) return eventQueue.peek();
+        if(globalQueue.size() > 0) return globalQueue.peek();
         return reader.peek();
     }
     
     public void queueEvent(XMLEvent e) {
         eventQueue.offer(e);
+    }
+    
+    public void flushEventQueue() {
+        while(!eventQueue.isEmpty()) {
+            XMLEvent e = eventQueue.pop();
+            globalQueue.addLast(e);
+        }
     }
 
     public XMLEventWriter getWriter() {

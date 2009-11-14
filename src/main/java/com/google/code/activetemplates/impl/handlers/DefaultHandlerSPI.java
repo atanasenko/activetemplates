@@ -28,8 +28,11 @@ import javax.xml.namespace.QName;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.lib.attributes.IfAttr;
+import com.google.code.activetemplates.lib.elements.Action;
 import com.google.code.activetemplates.lib.elements.Container;
+import com.google.code.activetemplates.lib.elements.Foreach;
 import com.google.code.activetemplates.lib.elements.If;
+import com.google.code.activetemplates.lib.elements.Nobr;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
 public class DefaultHandlerSPI implements HandlerSPI {
@@ -42,8 +45,11 @@ public class DefaultHandlerSPI implements HandlerSPI {
     private static final Set<String> excludedNamespaces = new HashSet<String>();
     
     static {
-        elements.put(If.TAG, new If());
+        elements.put(Action.TAG, new Action());
         elements.put(Container.TAG, new Container());
+        elements.put(Foreach.TAG, new Foreach());
+        elements.put(If.TAG, new If());
+        elements.put(Nobr.TAG, new Nobr());
         
         attributes.put(IfAttr.ATTRIBUTE, new IfAttr());
         

@@ -20,8 +20,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.bind.Bindings;
-import com.google.code.activetemplates.script.ScriptingProvider;
+import com.google.code.activetemplates.bind.BindingContext;
 
 /**
  * Base interface for all template events.
@@ -68,15 +67,17 @@ public interface TemplateEvent {
     public XMLEvent peekEvent() throws XMLStreamException;
 
     /**
-     * Adds xml event to event queue that will be processed before next event
-     * would be read from XMLEventReader 
+     * Adds xml event to event queue that will be processed after the current element's
+     * processing ends. Subsequent calls to this method from the same event would cause 
+     * them to be processed in the same order they were added.
+     * 
      * @param event
      */
     public void queueEvent(XMLEvent event);
     
     /**
-     * Adds action xml event to event queue which would execute specified
-     * action upon processing 
+     * Creates a new action xml event and queues it using queueEvent() method.
+     *  
      * @param a
      */
     public void queueAction(Action a);
@@ -89,19 +90,11 @@ public interface TemplateEvent {
     public void executeAction(String aid);
     
     /**
-     * Returns scripting provider instance associated with current compiling
-     * context.
+     * Returns current binding context.
      * 
      * @return
      */
-    public ScriptingProvider getScriptingProvider();
-    
-    /**
-     * Returns bindings for scripting provider.
-     * 
-     * @return
-     */
-    public Bindings getBindings();
+    public BindingContext getBindingContext();
     
     /**
      * Starts a new scripting scope

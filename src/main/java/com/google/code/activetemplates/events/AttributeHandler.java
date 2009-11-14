@@ -16,6 +16,8 @@
 
 package com.google.code.activetemplates.events;
 
+import javax.xml.stream.XMLStreamException;
+
 /**
  * Attribute event handler
  * 
@@ -57,7 +59,7 @@ public interface AttributeHandler {
      * @param attr
      * @return
      */
-    public Outcome processAttribute(AttributeEvent attr);
+    public Outcome processAttribute(AttributeEvent attr) throws XMLStreamException;
     
     
 }

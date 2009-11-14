@@ -29,7 +29,7 @@ public class ActionRegistry {
     
     public String registerAction(Action a) {
         if(actions == null) actions = new HashMap<String, Action>();
-        String aid = Long.valueOf(System.currentTimeMillis()).toString();
+        String aid = System.currentTimeMillis() + "-" + System.nanoTime();
         
         actions.put(aid, a);
         

@@ -20,6 +20,7 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
+import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.Action;
 import com.google.code.activetemplates.events.TemplateEvent;
@@ -40,8 +41,8 @@ abstract class TemplateEventImpl implements TemplateEvent {
         e = null;
     }
 
-    public Bindings getBindings() {
-        return cc.getBindingContext().getBindings();
+    public BindingContext getBindingContext() {
+        return cc.getBindingContext();
     }
     
     public void startScope(boolean topLevel) {
@@ -49,7 +50,7 @@ abstract class TemplateEventImpl implements TemplateEvent {
         if(topLevel) {
             b = cc.getTopLevelBindings();
         } else {
-            b = getBindings();
+            b = getBindingContext().getBindings();
         }
         b = cc.getScriptingProvider().createBindings(b);
         cc.pushBindings(b);
@@ -90,6 +91,7 @@ abstract class TemplateEventImpl implements TemplateEvent {
     public void queueAction(Action a) {
         
         String aid = cc.getActionRegistry().registerAction(a);
+        System.out.println("Registering action: " + aid);
         
         cc.queueEvent(com.google.code.activetemplates.lib.elements.Action.createActionStartEvent(
                 cc.getElementFactory(), aid));

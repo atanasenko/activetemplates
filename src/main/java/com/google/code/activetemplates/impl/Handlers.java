@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
@@ -69,7 +70,7 @@ class Handlers {
         return elements.containsKey(name);
     }
     
-    public AttributeHandler.Outcome processAttribute(CompileContext cc, Attribute attr) {
+    public AttributeHandler.Outcome processAttribute(CompileContext cc, Attribute attr) throws XMLStreamException {
         AttributeHandler h = attributes.get(attr.getName());
         if(h == null) throw new IllegalStateException("Attribute " + attr.getName() + " is not handled");
         AttributeEventImpl ev = eventPool.borrowAttributeEvent();
@@ -82,7 +83,7 @@ class Handlers {
         }
     }
     
-    public ElementHandler.Outcome processStartElement(CompileContext cc, StartElement el) {
+    public ElementHandler.Outcome processStartElement(CompileContext cc, StartElement el) throws XMLStreamException {
         ElementHandler h = elements.get(el.getName());
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
         
@@ -100,7 +101,7 @@ class Handlers {
         }
     }
 
-    public ElementHandler.Outcome processEndElement(CompileContext cc, EndElement el) {
+    public ElementHandler.Outcome processEndElement(CompileContext cc, EndElement el) throws XMLStreamException {
         ElementHandler h = elements.get(el.getName());
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
         

@@ -45,5 +45,14 @@ public class BindingResolverDelegate implements BindingResolver {
         
         return br.resolve(prefix, value, bc);
     }
+    
+    public Object resolve(String value, BindingContext bc) {
+        
+        String[] parts = value.split(":", 2);
+        String prefix = parts.length == 2 ? parts[0].trim() : "";
+        String expr = parts.length == 2 ? parts[1].trim() : parts[0].trim();
+        
+        return resolve(prefix, expr, bc);
+    }
 
 }
