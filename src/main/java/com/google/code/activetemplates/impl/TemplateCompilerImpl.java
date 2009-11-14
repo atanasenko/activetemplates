@@ -47,14 +47,11 @@ import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateCompileException;
 import com.google.code.activetemplates.TemplateCompiler;
 import com.google.code.activetemplates.TemplateCompilerConfig;
-import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
-import com.google.code.activetemplates.exp.CompoundExpansion;
 import com.google.code.activetemplates.exp.Expansion;
 import com.google.code.activetemplates.exp.ExpansionParser;
-import com.google.code.activetemplates.exp.StringExpansion;
 import com.google.code.activetemplates.script.ScriptingAction;
 import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
@@ -291,7 +288,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                         throw new IllegalStateException("Error parsing:\n" + data, e);
                     }
                     
-                    // 
+                    /*
                     boolean simple = true;
                     if(ex instanceof CompoundExpansion) {
                         CompoundExpansion ce = (CompoundExpansion) ex;
@@ -305,15 +302,18 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     if(simple) {
                         ex = DUMMY_EXPANSION;
                     }
+                    */
                     
                     expansionCache.put(data, ex);
                 }
             }
         }
         
-        if(ex == DUMMY_EXPANSION)
-            return null;
-
+        //if(ex == DUMMY_EXPANSION) return null;
+        
+        System.out.println("Data: " + data);
+        System.out.println("Expansion: " + ex);
+        
         StringBuilder sb = new StringBuilder();
         ex.resolve(sb, cc.getBindingContext());
         String val = sb.toString();
@@ -357,8 +357,10 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
     }
     
+    /*
     private static final Expansion DUMMY_EXPANSION = new Expansion() {
         public void resolve(StringBuilder sb, BindingContext bc) {}
     };
+    */
 
 }

@@ -16,7 +16,17 @@
 
 package com.google.code.activetemplates.exp;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ExpansionParser {
+
+    private static final Map<Character, String> escapes = new HashMap<Character, String>();
+    
+    static {
+        escapes.put('$', "$");
+        escapes.put('\\', "\\");
+    }
 
     public static Expansion parse(String s){
         
@@ -54,7 +64,20 @@ public class ExpansionParser {
                     break;
                 }
                 
-            } else if(isStart()) {
+            } else if(source.charAt(idx) == '\\') {
+                // escape - next char will be escaped or go in as-is
+                
+                idx++;
+                char c = source.charAt(idx);
+                //System.out.println("Escape char, next = `" + c + "`");
+                if(escapes.containsKey(c)) {
+                    sb.append(escapes.get(c));
+                } else {
+                    sb.append(c);
+                }
+                idx++;
+                
+            } else if(source.charAt(idx) == '$' && source.charAt(idx+1) == '{') {
                 // start of inner expansion
                 
                 appendString(ce);
@@ -62,15 +85,10 @@ public class ExpansionParser {
                 idx += 2;
                 ce.addExpansion(new BindingExpansion(parse(true)));
                 
-            } else if(isEnd()) {
+            } else if(source.charAt(idx) == '}' && inner) {
                 // end of inner expansion
                 
-                if(!inner) {
-                    throw new IllegalStateException("Unexpected '}' encountered");
-                }
-                
                 appendString(ce);
-
                 idx++;
                 break;
             
@@ -84,33 +102,6 @@ public class ExpansionParser {
         }
         
         return ce;
-    }
-    
-    private boolean isStart(){
-        if(source.charAt(idx) == '$' && source.charAt(idx+1) == '{') {
-            return !isEscaped();
-        }
-        return false;
-    }
-    
-    private boolean isEnd(){
-        if(source.charAt(idx) == '}') {
-            return !isEscaped();
-        }
-        return false;
-    }
-    
-    private boolean isEscaped(){
-        // check for escapes
-        if(idx > 1 && source.charAt(idx-1) == '\\' && source.charAt(idx-2) == '\\') {
-            // double escape: convert to one escape
-            sb.setLength(sb.length() - 1); // strips one slash from the end
-        } else if(idx > 0 && source.charAt(idx-1) == '\\') {
-            // single slash: not a start
-            sb.setLength(sb.length() - 1); // strips this slash from the end
-            return true;
-        }
-        return false;
     }
     
     private void appendString(CompoundExpansion ce) {
