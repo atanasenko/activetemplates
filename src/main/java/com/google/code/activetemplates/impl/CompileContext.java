@@ -16,6 +16,8 @@
 
 package com.google.code.activetemplates.impl;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -28,6 +30,7 @@ import javax.xml.stream.events.XMLEvent;
 import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.BindingResolverDelegate;
 import com.google.code.activetemplates.bind.Bindings;
+import com.google.code.activetemplates.events.ActionRegistry;
 import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
 
@@ -38,11 +41,12 @@ public class CompileContext {
     private XMLEventFactory elementFactory;
     private ScriptingProvider script;
     private ScriptingContext scriptingContext;
-    private Bindings bindings;
+    private Deque<Bindings> bindingStack;
     
     private BindingContext bindingContext;
     
     private Queue<XMLEvent> eventQueue;
+    private ActionRegistry actionRegistry;
 
     public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
         reader = r;
@@ -50,11 +54,14 @@ public class CompileContext {
         elementFactory = ef;
         script = sc;
         scriptingContext = sctx;
-        
+
+        bindingStack = new ArrayDeque<Bindings>();
         eventQueue = new LinkedList<XMLEvent>();
+        actionRegistry = new ActionRegistry();
         
         bindingContext = new BindingContext(script, new BindingResolverDelegate());
-        setBindings(b);
+        pushBindings(b);
+
     }
 
     /*
@@ -89,28 +96,42 @@ public class CompileContext {
         return elementFactory;
     }
     
+    public ActionRegistry getActionRegistry() {
+        return actionRegistry;
+    }
+
     public ScriptingProvider getScriptingProvider(){
         return script;
-    }
-    
-    public Bindings getBindings() {
-        return bindings;
     }
     
     public BindingContext getBindingContext() {
         return bindingContext;
     }
 
-    public void setBindings(Bindings bindings) {
-        if(bindings == null) {
+    public Bindings getTopLevelBindings() {
+        return bindingStack.getLast();
+    }
+    
+    public void pushBindings(Bindings b) {
+        if(b == null) {
             throw new NullPointerException("bindings");
         }
-        this.bindings = bindings;
-        bindingContext.setBindings(bindings);
+        bindingStack.push(b);
+        
+        bindingContext.setBindings(b);
     }
-
+    
+    public void popBindings(){
+        if(bindingStack.size() <= 1) {
+            throw new IllegalStateException("Cannot end initial scope");
+        }
+        
+        Bindings b = bindingStack.pop();
+        bindingContext.setBindings(b);
+    }
+    
     public ScriptingContext getScriptingContext() {
         return scriptingContext;
     }
-    
+
 }

@@ -75,6 +75,20 @@ public interface TemplateEvent {
     public void queueEvent(XMLEvent event);
     
     /**
+     * Adds action xml event to event queue which would execute specified
+     * action upon processing 
+     * @param a
+     */
+    public void queueAction(Action a);
+    
+    /**
+     * Executes action identified by specified action id
+     * 
+     * @param aid
+     */
+    public void executeAction(String aid);
+    
+    /**
      * Returns scripting provider instance associated with current compiling
      * context.
      * 
@@ -83,15 +97,22 @@ public interface TemplateEvent {
     public ScriptingProvider getScriptingProvider();
     
     /**
-     * Returns bindings for scripting provider
+     * Returns bindings for scripting provider.
+     * 
      * @return
      */
     public Bindings getBindings();
     
     /**
-     * Sets new bindings for compilation process
-     * @param b
+     * Starts a new scripting scope
+     * 
+     * @param topLevel
      */
-    public void setBindings(Bindings b);
+    public void startScope(boolean topLevel);
     
+    /**
+     * Ends current scripting scope
+ 
+     */
+    public void endScope();
 }

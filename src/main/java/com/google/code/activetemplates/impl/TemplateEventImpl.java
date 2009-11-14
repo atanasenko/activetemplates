@@ -21,6 +21,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.bind.Bindings;
+import com.google.code.activetemplates.events.Action;
 import com.google.code.activetemplates.events.TemplateEvent;
 import com.google.code.activetemplates.script.ScriptingProvider;
 
@@ -40,11 +41,26 @@ abstract class TemplateEventImpl implements TemplateEvent {
     }
 
     public Bindings getBindings() {
-        return cc.getBindings();
+        return cc.getBindingContext().getBindings();
     }
     
-    public void setBindings(Bindings b) {
-        cc.setBindings(b);
+    public void startScope(boolean topLevel) {
+        Bindings b;
+        if(topLevel) {
+            b = cc.getTopLevelBindings();
+        } else {
+            b = getBindings();
+        }
+        b = cc.getScriptingProvider().createBindings(b);
+        cc.pushBindings(b);
+    }
+
+    public void endScope() {
+        cc.popBindings();
+    }
+
+    public XMLEvent getEvent(){
+        return e;
     }
 
     public XMLEventFactory getEventFactory() {
@@ -71,8 +87,22 @@ abstract class TemplateEventImpl implements TemplateEvent {
         cc.queueEvent(e);
     }
 
-    public XMLEvent getEvent(){
-        return e;
+    public void queueAction(Action a) {
+        
+        String aid = cc.getActionRegistry().registerAction(a);
+        
+        cc.queueEvent(com.google.code.activetemplates.lib.elements.Action.createActionStartEvent(
+                cc.getElementFactory(), aid));
+        cc.queueEvent(com.google.code.activetemplates.lib.elements.Action.createActionEndEvent(
+                cc.getElementFactory()));
+    }
+
+    public void executeAction(String aid) {
+        Action a = cc.getActionRegistry().removeAction(aid);
+        
+        if(a == null) throw new IllegalStateException("No such action: " + aid);
+        
+        a.execute(this);
     }
 
 }

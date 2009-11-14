@@ -69,5 +69,5 @@ public class BindingContext {
     public BindingResolver getBindingResolver() {
         return bindingResolver;
     }
-    
+
 }
