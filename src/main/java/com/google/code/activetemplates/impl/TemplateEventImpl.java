@@ -91,7 +91,6 @@ abstract class TemplateEventImpl implements TemplateEvent {
     public void queueAction(Action a) {
         
         String aid = cc.getActionRegistry().registerAction(a);
-        System.out.println("Registering action: " + aid);
         
         cc.queueEvent(com.google.code.activetemplates.lib.elements.Action.createActionStartEvent(
                 cc.getElementFactory(), aid));

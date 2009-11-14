@@ -29,7 +29,6 @@ import javax.xml.stream.events.XMLEvent;
 import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.bind.BindingResolverDelegate;
 import com.google.code.activetemplates.bind.Bindings;
-import com.google.code.activetemplates.events.ActionRegistry;
 import com.google.code.activetemplates.script.ScriptingContext;
 import com.google.code.activetemplates.script.ScriptingProvider;
 

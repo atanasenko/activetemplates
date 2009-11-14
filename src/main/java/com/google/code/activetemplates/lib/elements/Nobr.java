@@ -42,7 +42,6 @@ public class Nobr implements ElementHandler {
     public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
         XMLEvent ne = e.nextEvent();
         
-        System.out.println("Next event: " + ne);
         if(ne.isCharacters()) {
             Characters c = ne.asCharacters();
             String d = c.getData().replaceAll("^[\\s]*", "");

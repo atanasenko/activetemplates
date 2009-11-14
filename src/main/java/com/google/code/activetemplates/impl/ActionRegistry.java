@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.events;
+package com.google.code.activetemplates.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import com.google.code.activetemplates.events.Action;
 
 public class ActionRegistry {
     
