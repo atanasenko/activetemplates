@@ -33,22 +33,24 @@ import com.google.code.activetemplates.util.ObjectIterator;
 import com.google.code.activetemplates.util.TemplateUtils;
 
 /**
- * Iterates over Map, Iterable, Array or a single Object passed to data attribute
+ * Iterates over Map, Iterable, Array or a single Object passed to data
+ * attribute
  * 
  * @author sleepless
- *
+ * 
  */
 public class Foreach implements ElementHandler {
-    
-    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "foreach");
 
-    private static final QName ATTR_DATA  = new QName("data");
+    public static final QName TAG = new QName(
+            DefaultHandlerSPI.NAMESPACE_STDLIB, "foreach");
+
+    private static final QName ATTR_DATA = new QName("data");
     private static final QName ATTR_VALUE = new QName("value");
     private static final QName ATTR_INDEX = new QName("index");
-    private static final QName ATTR_KEY   = new QName("key");
+    private static final QName ATTR_KEY = new QName("key");
 
     public Outcome processStart(StartElementEvent e) throws XMLStreamException {
-        
+
         // attributes
         String dValue = TemplateUtils.getAttribute(e, ATTR_DATA);
         String oName = TemplateUtils.getAttribute(e, ATTR_VALUE);
@@ -56,56 +58,66 @@ public class Foreach implements ElementHandler {
         String kName = TemplateUtils.getAttribute(e, ATTR_KEY, null);
 
         // read content
-        Queue<XMLEvent> q = TemplateUtils.readChildren(e, false);
-     
+        Queue<XMLEvent> q = TemplateUtils.readChildren(e.getTemplateContext(),
+                false);
+
         // data
-        BindingResolverDelegate br = e.getBindingContext().getBindingResolver();
-        Object data = br.resolve(dValue, e.getBindingContext());
+        BindingResolverDelegate br = e.getTemplateContext().getBindingContext()
+                .getBindingResolver();
+        Object data = br.resolve(dValue, e.getTemplateContext()
+                .getBindingContext());
         ObjectIterator oit = ObjectIterator.create(data);
-        
-        e.queueAction(new ForeachAction(oit, q, oName, iName, kName));
-        
+
+        e.getTemplateContext().queueAction(
+                new ForeachAction(oit, q, oName, iName, kName));
+
         return null;
     }
-    
+
     public Outcome processEnd(EndElementEvent e) {
         return null;
     }
 
-    private static class ForeachAction implements com.google.code.activetemplates.events.Action {
+    private static class ForeachAction implements
+            com.google.code.activetemplates.events.Action {
 
         private ObjectIterator oit;
         private Queue<XMLEvent> tree;
         private String[] vars;
-        
-        ForeachAction(ObjectIterator oit, Queue<XMLEvent> tree, String oName, String iName, String kName) {
+
+        ForeachAction(ObjectIterator oit, Queue<XMLEvent> tree, String oName,
+                String iName, String kName) {
             this.oit = oit;
             this.tree = tree;
-            
-            vars = new String[]{ oName, iName, kName };
+
+            vars = new String[] { oName, iName, kName };
         }
-        
+
         public void execute(TemplateEvent te) {
-            
-            if(oit.next()) {
-                
+
+            if (oit.next()) {
+
                 // setup scope
-                te.startScope(false);
-                Bindings b = te.getBindingContext().getBindings();
+                te.getTemplateContext().startScope(false);
+                Bindings b = te.getTemplateContext().getBindingContext()
+                        .getBindings();
                 b.bind(vars[0], oit.getObject());
-                if(vars[1] != null) b.bind(vars[1], oit.getIndex());
-                if(vars[2] != null) b.bind(vars[2], oit.getKey());
-                
-                for(XMLEvent e: tree) {
-                    te.queueEvent(e);
+                if (vars[1] != null)
+                    b.bind(vars[1], oit.getIndex());
+                if (vars[2] != null)
+                    b.bind(vars[2], oit.getKey());
+
+                for (XMLEvent e : tree) {
+                    te.getTemplateContext().queueEvent(e);
                 }
-                te.queueAction(TemplateUtils.END_SCOPE_ACTION);
-                te.queueAction(this);
-                
+                te.getTemplateContext().queueAction(
+                        TemplateUtils.END_SCOPE_ACTION);
+                te.getTemplateContext().queueAction(this);
+
             }
-            
+
         }
-        
+
     }
 
 }

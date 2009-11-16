@@ -16,96 +16,33 @@
 
 package com.google.code.activetemplates.events;
 
-import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.bind.BindingContext;
+import com.google.code.activetemplates.TemplateContext;
 
 /**
  * Base interface for all template events.
  * 
- * Note that TemplateEvent instances might be cached internally, so they
- * should not be used outside of corresponding process method.
+ * Note that TemplateEvent instances might be cached internally, so they should
+ * not be used outside of corresponding process method.
  * 
  * @author sleepless
- *
+ * 
  */
 public interface TemplateEvent {
 
     /**
      * Returns xml event associated with the current template event
+     * 
      * @return
      */
     public XMLEvent getEvent();
-    
-    
-    /**
-     * Returns generic XMLEventFactory
-     * @return
-     */
-    public XMLEventFactory getEventFactory();
-    
-    /**
-     * Whether or not reader or internal queue have any pending xml events
-     * @return
-     */
-    public boolean hasNextEvent();
-    
-    /**
-     * Returns next xml event from reader or internal queue
-     * @return
-     * @throws XMLStreamException
-     */
-    public XMLEvent nextEvent() throws XMLStreamException;
-    
-    /**
-     * Returns but does not remove next xml event from reader or internal queue.
-     * @return
-     * @throws XMLStreamException
-     */
-    public XMLEvent peekEvent() throws XMLStreamException;
 
     /**
-     * Adds xml event to event queue that will be processed after the current element's
-     * processing ends. Subsequent calls to this method from the same event would cause 
-     * them to be processed in the same order they were added.
-     * 
-     * @param event
-     */
-    public void queueEvent(XMLEvent event);
-    
-    /**
-     * Creates a new action xml event and queues it using queueEvent() method.
-     *  
-     * @param a
-     */
-    public void queueAction(Action a);
-    
-    /**
-     * Executes action identified by specified action id
-     * 
-     * @param aid
-     */
-    public void executeAction(String aid);
-    
-    /**
-     * Returns current binding context.
+     * Returns templateContext associated with current template compile process
      * 
      * @return
      */
-    public BindingContext getBindingContext();
-    
-    /**
-     * Starts a new scripting scope
-     * 
-     * @param topLevel
-     */
-    public void startScope(boolean topLevel);
-    
-    /**
-     * Ends current scripting scope
- 
-     */
-    public void endScope();
+    public TemplateContext getTemplateContext();
+
 }

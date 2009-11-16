@@ -9,23 +9,26 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 public class IfAttr implements AttributeHandler {
 
-    public static final QName ATTRIBUTE = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
+    public static final QName ATTRIBUTE = new QName(
+            DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
 
     public Outcome processAttribute(AttributeEvent e) {
-        
+
         Attribute a = e.getEvent();
         String v = a.getValue();
-        
-        if(v == null) {
+
+        if (v == null) {
             throw new IllegalStateException("Condition not specified");
         }
-        
-        if(!e.getBindingContext()
-                .getScriptingProvider()
-                .evalBoolean(v, e.getBindingContext().getBindings())) {
+
+        if (!e.getTemplateContext().getBindingContext().getScriptingProvider()
+                .evalBoolean(
+                        v,
+                        e.getTemplateContext().getBindingContext()
+                                .getBindings())) {
             return Outcome.PROCESS_NONE;
         }
-        
+
         return null;
     }
 

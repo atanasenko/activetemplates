@@ -28,31 +28,33 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
  * Processes element children only if name attribute evaluates to true
  * 
  * @author sleepless
- *
+ * 
  */
 public class If implements ElementHandler {
-    
-    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
-    
+
+    public static final QName TAG = new QName(
+            DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
+
     private static final QName ATTR_CONDITION = new QName("condition");
 
     public Outcome processStart(StartElementEvent e) {
-        
+
         String v;
         Attribute a = e.getEvent().getAttributeByName(ATTR_CONDITION);
         v = a != null ? a.getValue() : null;
-        
-        if(v == null) {
+
+        if (v == null) {
             throw new IllegalStateException("Condition not specified");
         }
-        
-        
-        if(!e.getBindingContext()
-                .getScriptingProvider()
-                .evalBoolean(v, e.getBindingContext().getBindings())) {
+
+        if (!e.getTemplateContext().getBindingContext().getScriptingProvider()
+                .evalBoolean(
+                        v,
+                        e.getTemplateContext().getBindingContext()
+                                .getBindings())) {
             return Outcome.PROCESS_SIBLINGS;
         }
-        
+
         return null;
     }
 

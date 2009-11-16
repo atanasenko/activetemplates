@@ -27,27 +27,32 @@ import com.google.code.activetemplates.events.StartElementEvent;
 import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 /**
- * Causes next 'characters' element to be stripped of whitespaces at the beginning
+ * Causes next 'characters' element to be stripped of whitespaces at the
+ * beginning
+ * 
  * @author sleepless
- *
+ * 
  */
 public class Nobr implements ElementHandler {
 
-    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "nobr");
+    public static final QName TAG = new QName(
+            DefaultHandlerSPI.NAMESPACE_STDLIB, "nobr");
 
     public Outcome processStart(StartElementEvent e) {
         return null;
     }
 
     public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
-        XMLEvent ne = e.nextEvent();
-        
-        if(ne.isCharacters()) {
+        XMLEvent ne = e.getTemplateContext().nextEvent();
+
+        if (ne.isCharacters()) {
             Characters c = ne.asCharacters();
             String d = c.getData().replaceAll("^[\\s]*", "");
-            e.queueEvent(e.getEventFactory().createCharacters(d));
+            e.getTemplateContext().queueEvent(
+                    e.getTemplateContext().getEventFactory()
+                            .createCharacters(d));
         } else {
-            e.queueEvent(ne);
+            e.getTemplateContext().queueEvent(ne);
         }
         return null;
     }
