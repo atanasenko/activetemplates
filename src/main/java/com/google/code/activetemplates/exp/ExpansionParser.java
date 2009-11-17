@@ -22,93 +22,100 @@ import java.util.Map;
 public class ExpansionParser {
 
     private static final Map<Character, String> escapes = new HashMap<Character, String>();
-    
+
     static {
         escapes.put('$', "$");
+        escapes.put('#', "#");
         escapes.put('\\', "\\");
     }
 
-    public static Expansion parse(String s){
-        
+    public static Expansion parse(String s) {
+
         ExpansionParser p = new ExpansionParser(s);
         return p.parse(false);
     }
-    
+
     private int idx;
     private String source;
     private StringBuilder sb;
-    
+
     private ExpansionParser(String source) {
         this.source = source;
         idx = 0;
         sb = new StringBuilder();
     }
-    
-    private CompoundExpansion parse(boolean inner){
-        
+
+    private CompoundExpansion parse(boolean inner) {
+
         CompoundExpansion ce = new CompoundExpansion();
-        
+
         int idxStart = idx;
-        
-        while(true) {
-            
-            if(idx >= source.length()) {
+
+        while (true) {
+
+            if (idx >= source.length()) {
                 // end of stream
-                
-                if(inner) {
+
+                if (inner) {
                     // unexpected end of inner expression
-                    throw new IllegalStateException("Unexpected end of stream reached at `" + source.substring(idxStart, idx) + "`");
+                    throw new IllegalStateException(
+                            "Unexpected end of stream reached at `"
+                                    + source.substring(idxStart, idx) + "`");
                 } else {
                     // end of outer stream
                     appendString(ce);
                     break;
                 }
-                
-            } else if(source.charAt(idx) == '\\') {
+
+            } else if (source.charAt(idx) == '\\') {
                 // escape - next char will be escaped or go in as-is
-                
+
                 idx++;
                 char c = source.charAt(idx);
-                //System.out.println("Escape char, next = `" + c + "`");
-                if(escapes.containsKey(c)) {
+                // System.out.println("Escape char, next = `" + c + "`");
+                if (escapes.containsKey(c)) {
                     sb.append(escapes.get(c));
                 } else {
                     sb.append(c);
                 }
                 idx++;
-                
-            } else if(source.charAt(idx) == '$' && source.charAt(idx+1) == '{') {
+
+            } else if ((source.charAt(idx) == '$' || source.charAt(idx) == '#')
+                    && source.charAt(idx + 1) == '{') {
                 // start of inner expansion
-                
+
                 appendString(ce);
-                
+                CompoundExpansion e = parse(true);
+                if (source.charAt(idx) == '$')
+                    ce.addExpansion(new FixedBindingExpansion("js", e));
+                else
+                    ce.addExpansion(new BindingExpansion(e));
                 idx += 2;
-                ce.addExpansion(new BindingExpansion(parse(true)));
-                
-            } else if(source.charAt(idx) == '}' && inner) {
+
+            } else if (source.charAt(idx) == '}' && inner) {
                 // end of inner expansion
-                
+
                 appendString(ce);
                 idx++;
                 break;
-            
+
             } else {
                 // text input
-                
+
                 sb.append(source.charAt(idx));
                 idx++;
-                
+
             }
         }
-        
+
         return ce;
     }
-    
+
     private void appendString(CompoundExpansion ce) {
-        if(sb.length() > 0) {
+        if (sb.length() > 0) {
             ce.addExpansion(new StringExpansion(sb.toString()));
             sb.setLength(0);
         }
     }
-    
+
 }

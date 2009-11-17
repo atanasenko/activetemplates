@@ -19,16 +19,19 @@ package com.google.code.activetemplates.exp;
 import com.google.code.activetemplates.bind.BindingContext;
 
 /**
- * Expansion which delegates resolution process to binding resolver
+ * Expansion which delegates resolution process to binding resolver and always
+ * uses specified prefix
  * 
  * @author sleepless
  * 
  */
-public class BindingExpansion implements Expansion {
+public class FixedBindingExpansion implements Expansion {
 
+    private String prefix;
     private CompoundExpansion compound;
 
-    public BindingExpansion(CompoundExpansion ce) {
+    public FixedBindingExpansion(String prefix, CompoundExpansion ce) {
+        this.prefix = prefix;
         compound = ce;
     }
 
@@ -38,18 +41,14 @@ public class BindingExpansion implements Expansion {
         compound.resolve(sb2, bc);
         String binding = sb2.toString();
 
-        String[] parts = binding.split(":", 2);
-        String prefix = parts.length == 2 ? parts[0].trim() : "";
-        String expr = parts.length == 2 ? parts[1].trim() : parts[0].trim();
-
-        Object o = bc.getBindingResolver().resolve(prefix, expr, bc);
+        Object o = bc.getBindingResolver().resolve(prefix, binding, bc);
         if (o != null) {
             sb.append(o);
         }
     }
 
     public String toString() {
-        return "#{ " + compound + " }";
+        return "${ " + compound + " }";
     }
 
 }
