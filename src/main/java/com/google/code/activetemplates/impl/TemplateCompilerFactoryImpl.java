@@ -17,14 +17,13 @@
 package com.google.code.activetemplates.impl;
 
 import com.google.code.activetemplates.TemplateCompiler;
-import com.google.code.activetemplates.TemplateCompilerConfig;
 import com.google.code.activetemplates.TemplateCompilerFactory;
 
 public class TemplateCompilerFactoryImpl extends TemplateCompilerFactory {
 
     @Override
-    public TemplateCompiler createCompiler(TemplateCompilerConfig conf) {
-        return new TemplateCompilerImpl(conf);
+    public TemplateCompiler createCompiler() {
+        return new TemplateCompilerImpl();
     }
 
 }

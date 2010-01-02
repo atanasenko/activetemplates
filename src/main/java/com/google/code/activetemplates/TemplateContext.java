@@ -20,7 +20,6 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.bind.BindingContext;
 import com.google.code.activetemplates.events.Action;
 
 /**
@@ -85,24 +84,5 @@ public interface TemplateContext {
      * @param aid
      */
     public void executeAction(String aid);
-
-    /**
-     * Returns current binding context.
-     * 
-     * @return
-     */
-    public BindingContext getBindingContext();
-
-    /**
-     * Starts a new scripting scope
-     * 
-     * @param topLevel
-     */
-    public void startScope(boolean topLevel);
-
-    /**
-     * Ends current scripting scope
-     */
-    public void endScope();
 
 }

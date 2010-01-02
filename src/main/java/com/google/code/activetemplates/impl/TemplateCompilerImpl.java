@@ -16,18 +16,14 @@
 
 package com.google.code.activetemplates.impl;
 
-
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.xml.stream.Location;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -43,39 +39,31 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
+
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateCompileException;
 import com.google.code.activetemplates.TemplateCompiler;
-import com.google.code.activetemplates.TemplateCompilerConfig;
-import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
-import com.google.code.activetemplates.exp.Expansion;
-import com.google.code.activetemplates.exp.ExpansionParser;
-import com.google.code.activetemplates.script.ScriptingAction;
-import com.google.code.activetemplates.script.ScriptingContext;
-import com.google.code.activetemplates.script.ScriptingProvider;
 import com.google.code.activetemplates.spi.HandlerSPI;
 import com.google.code.activetemplates.spi.Providers;
 
 public class TemplateCompilerImpl implements TemplateCompiler {
     
-    private ScriptingProvider script;
     private XMLOutputFactory outFactory;
     private XMLInputFactory inFactory;
     private XMLEventFactory eFactory;
     private Handlers h;
     
     private Set<String> excludedNamespaces;
+    private ExpressionParser expressionParser;
     
-    private Map<String, Expansion> expansionCache;
-    
-    public TemplateCompilerImpl(TemplateCompilerConfig conf){
-        script = conf.getScriptingProvider();
-        if(script == null) {
-            throw new IllegalArgumentException("Scripting provider is not supplied");
-        }
-        
+    public TemplateCompilerImpl(){
+
         outFactory = XMLOutputFactory.newInstance();
         inFactory = XMLInputFactory.newInstance();
         eFactory = XMLEventFactory.newInstance();
@@ -92,21 +80,21 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             }
         }
         
-        expansionCache = new HashMap<String, Expansion>();
+        expressionParser = new SpelExpressionParser();
     }
 
     @Override
-    public void compile(Template t, Map<String, ?> map, OutputStream out) throws TemplateCompileException {
-        compile(t, map, new StreamResult(out));
+    public void compile(Template t, Object context, OutputStream out) throws TemplateCompileException {
+        compile(t, context, new StreamResult(out));
     }
 
     @Override
-    public void compile(Template t, Map<String, ?> map, Writer out) throws TemplateCompileException {
-        compile(t, map, new StreamResult(out));
+    public void compile(Template t, Object context, Writer out) throws TemplateCompileException {
+        compile(t, context, new StreamResult(out));
     }
 
     @Override
-    public void compile(final Template t, final Map<String, ?> map, Result out) throws TemplateCompileException {
+    public void compile(final Template t, final Object context, Result out) throws TemplateCompileException {
         
         final TemplateImpl ti = (TemplateImpl) t;
         
@@ -120,22 +108,11 @@ public class TemplateCompilerImpl implements TemplateCompiler {
 
             final XMLEventReader fr = r;
             final XMLEventWriter fw = w;
-            script.call(new ScriptingAction() {
-                public void call(ScriptingContext sc) {
-                    try {
-                        Bindings b = script.createBindings(sc);
-                        for(Map.Entry<String, ?> e: map.entrySet()) {
-                            b.bind(e.getKey(), e.getValue());
-                        }
+            
+            EvaluationContext eContext = new StandardEvaluationContext(context);
                         
-                        CompileContext ctx = new CompileContext(fr, fw, eFactory, script, sc, b);
-                        
-                        doCompile(t.getName(), ctx);
-                    } catch(XMLStreamException e) {
-                        xe[0] = e;
-                    }
-                }
-            });
+            CompileContext ctx = new CompileContext(fr, fw, eFactory, expressionParser, eContext);
+            doCompile(t.getName(), ctx);
             
             if(xe[0] != null) {
                 throw xe[0];
@@ -156,9 +133,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
 
             XMLEvent e = cc.nextEvent();
 
-            ScriptingContext sctx = cc.getScriptingContext();
-            Location loc = e.getLocation();
-            sctx.setLocation(name + ":" + (loc == null ? "unknown" : loc.getLineNumber()));
+            //Location loc = e.getLocation();
             
             if_tag:
             if(e.isStartElement()) {
@@ -275,49 +250,8 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     }
     
     private String processText(CompileContext cc, String data) {
-        
-        Expansion ex = expansionCache.get(data);
-        if(ex == null) {
-            
-            synchronized(expansionCache) {
-                ex = expansionCache.get(data);
-                if(ex == null) {
-                    try {
-                        ex = ExpansionParser.parse(data);
-                    } catch(Exception e) {
-                        throw new IllegalStateException("Error parsing:\n" + data, e);
-                    }
-                    
-                    /*
-                    boolean simple = true;
-                    if(ex instanceof CompoundExpansion) {
-                        CompoundExpansion ce = (CompoundExpansion) ex;
-                        for(Expansion e: ce.getExpansions()) {
-                            if(!(e instanceof StringExpansion)) {
-                                simple = false;
-                                break;
-                            }
-                        }
-                    }
-                    if(simple) {
-                        ex = DUMMY_EXPANSION;
-                    }
-                    */
-                    
-                    expansionCache.put(data, ex);
-                }
-            }
-        }
-        
-        //if(ex == DUMMY_EXPANSION) return null;
-        
-        System.out.println("Data: " + data);
-        System.out.println("Expansion: " + ex);
-        
-        StringBuilder sb = new StringBuilder();
-        ex.resolve(sb, cc.getBindingContext());
-        String val = sb.toString();
-        
+        String val = cc.parseTemplateExpression(data, String.class);
+        if(val == null) val = "";
         if(val.equals(data))
             return null;
         
@@ -357,10 +291,4 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         
     }
     
-    /*
-    private static final Expansion DUMMY_EXPANSION = new Expansion() {
-        public void resolve(StringBuilder sb, BindingContext bc) {}
-    };
-    */
-
 }

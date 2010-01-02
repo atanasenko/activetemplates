@@ -50,6 +50,6 @@ public abstract class TemplateCompilerFactory {
      * 
      * @return
      */
-    public abstract TemplateCompiler createCompiler(TemplateCompilerConfig conf);
+    public abstract TemplateCompiler createCompiler();
 
 }

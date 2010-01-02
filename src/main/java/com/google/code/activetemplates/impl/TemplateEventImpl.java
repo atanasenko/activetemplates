@@ -19,13 +19,9 @@ package com.google.code.activetemplates.impl;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-
 import com.google.code.activetemplates.TemplateContext;
-import com.google.code.activetemplates.bind.BindingContext;
-import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.Action;
 import com.google.code.activetemplates.events.TemplateEvent;
-import com.google.code.activetemplates.script.ScriptingProvider;
 
 abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
 
@@ -41,7 +37,8 @@ abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
         cc = null;
         e = null;
     }
-
+    
+    /*
     public TemplateContext getTemplateContext() {
         return this;
     }
@@ -69,12 +66,25 @@ abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
         cc.popBindings();
     }
 
-    public XMLEventFactory getEventFactory() {
-        return cc.getElementFactory();
+    public ScriptingProvider getScriptingProvider(){
+        return cc.getScriptingProvider();
+    }
+    */
+
+    public <T> T parseExpression(String expression, Class<T> clazz) {
+        return cc.parseExpression(expression, clazz);
+    }
+    
+    public void setExpressionValue(String expression, Object value) {
+        cc.setExpressionValue(expression, value);
     }
 
-    public ScriptingProvider getScriptingProvider() {
-        return cc.getScriptingProvider();
+    public XMLEvent getEvent(){
+        return e;
+    }
+
+    public XMLEventFactory getEventFactory() {
+        return cc.getElementFactory();
     }
 
     public boolean hasNextEvent() {
@@ -110,6 +120,11 @@ abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
             throw new IllegalStateException("No such action: " + aid);
 
         a.execute(this);
+    }
+
+    @Override
+    public TemplateContext getTemplateContext() {
+        return this;
     }
 
 }

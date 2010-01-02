@@ -16,7 +16,6 @@
 
 package com.google.code.activetemplates.impl;
 
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -26,42 +25,38 @@ import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.bind.BindingContext;
-import com.google.code.activetemplates.bind.BindingResolverDelegate;
-import com.google.code.activetemplates.bind.Bindings;
-import com.google.code.activetemplates.script.ScriptingContext;
-import com.google.code.activetemplates.script.ScriptingProvider;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 
 public class CompileContext {
     
+    private static final ParserContext TEMPLATE_PARSER_CONTEXT = 
+        new TemplateParserContext("${", "}");
+
     private XMLEventReader reader;
     private XMLEventWriter writer;
     private XMLEventFactory elementFactory;
-    
-    private ScriptingProvider script;
-    private ScriptingContext scriptingContext;
-    private Deque<Bindings> bindingStack;
-    private BindingContext bindingContext;
     
     private Deque<XMLEvent> globalQueue;
     private Deque<XMLEvent> eventQueue;
     private ActionRegistry actionRegistry;
     
-    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ScriptingProvider sc, ScriptingContext sctx, Bindings b) {
+    private ExpressionParser expressionParser;
+    private EvaluationContext evaluationContext;
+    
+    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ExpressionParser eParser, EvaluationContext eContext) {
         reader         = r;
         writer         = w;
         elementFactory = ef;
-        
-        script           = sc;
-        scriptingContext = sctx;
-        bindingStack     = new ArrayDeque<Bindings>();
-        bindingContext   = new BindingContext(script, new BindingResolverDelegate());
+        expressionParser  = eParser;
+        evaluationContext = eContext;
         
         globalQueue    = new LinkedList<XMLEvent>();
         eventQueue     = new LinkedList<XMLEvent>();
         actionRegistry = new ActionRegistry();
-        
-        pushBindings(b);
     }
 
     public boolean hasNextEvent(){
@@ -101,38 +96,23 @@ public class CompileContext {
         return actionRegistry;
     }
 
-    public ScriptingProvider getScriptingProvider(){
-        return script;
+    public EvaluationContext getEvaluationContext(){
+        return evaluationContext;
     }
     
-    public BindingContext getBindingContext() {
-        return bindingContext;
-    }
-
-    public Bindings getTopLevelBindings() {
-        return bindingStack.getLast();
+    public <T> T parseExpression(String expression, Class<T> clazz) {
+        Expression expr = expressionParser.parseExpression(expression);
+        return expr.getValue(getEvaluationContext(), clazz);
     }
     
-    public void pushBindings(Bindings b) {
-        if(b == null) {
-            throw new NullPointerException("bindings");
-        }
-        bindingStack.push(b);
-        
-        bindingContext.setBindings(b);
+    public <T> T parseTemplateExpression(String expression, Class<T> clazz) {
+        Expression expr = expressionParser.parseExpression(expression, TEMPLATE_PARSER_CONTEXT);
+        return expr.getValue(getEvaluationContext(), clazz);
     }
     
-    public void popBindings(){
-        if(bindingStack.size() <= 1) {
-            throw new IllegalStateException("Cannot end initial scope");
-        }
-        
-        Bindings b = bindingStack.pop();
-        bindingContext.setBindings(b);
-    }
-    
-    public ScriptingContext getScriptingContext() {
-        return scriptingContext;
+    public void setExpressionValue(String expression, Object value) {
+        Expression expr = expressionParser.parseExpression(expression);
+        expr.setValue(getEvaluationContext(), value);
     }
 
 }

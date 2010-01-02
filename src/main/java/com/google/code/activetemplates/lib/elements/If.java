@@ -46,12 +46,8 @@ public class If implements ElementHandler {
         if (v == null) {
             throw new IllegalStateException("Condition not specified");
         }
-
-        if (!e.getTemplateContext().getBindingContext().getScriptingProvider()
-                .evalBoolean(
-                        v,
-                        e.getTemplateContext().getBindingContext()
-                                .getBindings())) {
+        
+        if(!e.parseExpression(v, Boolean.class).booleanValue()) {
             return Outcome.PROCESS_SIBLINGS;
         }
 

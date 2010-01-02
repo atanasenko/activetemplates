@@ -22,8 +22,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.bind.BindingResolverDelegate;
-import com.google.code.activetemplates.bind.Bindings;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
@@ -62,10 +60,7 @@ public class Foreach implements ElementHandler {
                 false);
 
         // data
-        BindingResolverDelegate br = e.getTemplateContext().getBindingContext()
-                .getBindingResolver();
-        Object data = br.resolve(dValue, e.getTemplateContext()
-                .getBindingContext());
+        Object data = e.parseExpression(dValue, Object.class);
         ObjectIterator oit = ObjectIterator.create(data);
 
         e.getTemplateContext().queueAction(
@@ -98,22 +93,14 @@ public class Foreach implements ElementHandler {
             if (oit.next()) {
 
                 // setup scope
-                te.getTemplateContext().startScope(false);
-                Bindings b = te.getTemplateContext().getBindingContext()
-                        .getBindings();
-                b.bind(vars[0], oit.getObject());
-                if (vars[1] != null)
-                    b.bind(vars[1], oit.getIndex());
-                if (vars[2] != null)
-                    b.bind(vars[2], oit.getKey());
-
-                for (XMLEvent e : tree) {
-                    te.getTemplateContext().queueEvent(e);
+                te.setExpressionValue(vars[0], oit.getObject());
+                if(vars[1] != null) te.setExpressionValue(vars[1], oit.getIndex());
+                if(vars[2] != null) te.setExpressionValue(vars[2], oit.getKey());
+                
+                for(XMLEvent e: tree) {
+                    te.queueEvent(e);
                 }
-                te.getTemplateContext().queueAction(
-                        TemplateUtils.END_SCOPE_ACTION);
                 te.getTemplateContext().queueAction(this);
-
             }
 
         }

@@ -25,9 +25,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 
 import com.google.code.activetemplates.TemplateContext;
-import com.google.code.activetemplates.events.Action;
 import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.events.TemplateEvent;
 
 public final class TemplateUtils {
 
@@ -148,10 +146,4 @@ public final class TemplateUtils {
                     + attribute.getLocalPart() + " not specified");
         return a.getValue();
     }
-
-    public static final Action END_SCOPE_ACTION = new Action() {
-        public void execute(TemplateEvent e) {
-            e.getTemplateContext().endScope();
-        }
-    };
 }

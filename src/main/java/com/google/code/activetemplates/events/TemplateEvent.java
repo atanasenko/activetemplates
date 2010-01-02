@@ -41,6 +41,42 @@ public interface TemplateEvent {
     /**
      * Returns templateContext associated with current template compile process
      * 
+     * @param event
+     */
+    public void queueEvent(XMLEvent event);
+    
+    /**
+     * Creates a new action xml event and queues it using queueEvent() method.
+     *  
+     * @param a
+     */
+    public void queueAction(Action a);
+    
+    /**
+     * Executes action identified by specified action id
+     * 
+     * @param aid
+     */
+    public void executeAction(String aid);
+    
+    /**
+     * Parses expression using current evaluation context
+     * @param <T>
+     * @param expression
+     * @param clazz
+     * @return
+     */
+    public <T> T parseExpression(String expression, Class<T> clazz);
+    
+    /**
+     * Set expression value
+     * @param expression
+     * @param value
+     */
+    public void setExpressionValue(String expression, Object value);
+
+    /**
+     * Gets the associated template context
      * @return
      */
     public TemplateContext getTemplateContext();
