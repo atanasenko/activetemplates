@@ -18,7 +18,7 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.TemplateContext;
+import com.google.code.activetemplates.XMLStreamContext;
 
 /**
  * Base interface for all template events.
@@ -39,27 +39,6 @@ public interface TemplateEvent {
     public XMLEvent getEvent();
 
     /**
-     * Returns templateContext associated with current template compile process
-     * 
-     * @param event
-     */
-    public void queueEvent(XMLEvent event);
-    
-    /**
-     * Creates a new action xml event and queues it using queueEvent() method.
-     *  
-     * @param a
-     */
-    public void queueAction(Action a);
-    
-    /**
-     * Executes action identified by specified action id
-     * 
-     * @param aid
-     */
-    public void executeAction(String aid);
-    
-    /**
      * Parses expression using current evaluation context
      * @param <T>
      * @param expression
@@ -76,9 +55,16 @@ public interface TemplateEvent {
     public void setExpressionValue(String expression, Object value);
 
     /**
-     * Gets the associated template context
+     * Executes action identified by specified action id
+     * 
+     * @param aid
+     */
+    public void executeAction(String aid);
+
+    /**
+     * Gets the associated xml stream context
      * @return
      */
-    public TemplateContext getTemplateContext();
+    public XMLStreamContext getTemplateContext();
 
 }

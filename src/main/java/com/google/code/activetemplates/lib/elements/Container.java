@@ -34,7 +34,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
  */
 public class Container implements ElementHandler {
 
-    public static final QName TAG = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "container");
+    public static final QName ELEMENT = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "container");
 
     public Outcome processStart(StartElementEvent e) {
         return Outcome.PROCESS_CHILDREN;

@@ -30,7 +30,7 @@ import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.lib.attributes.IfAttr;
 import com.google.code.activetemplates.lib.elements.Action;
 import com.google.code.activetemplates.lib.elements.Container;
-import com.google.code.activetemplates.lib.elements.Foreach;
+import com.google.code.activetemplates.lib.elements.Each;
 import com.google.code.activetemplates.lib.elements.If;
 import com.google.code.activetemplates.lib.elements.Nobr;
 import com.google.code.activetemplates.spi.HandlerSPI;
@@ -45,11 +45,11 @@ public class DefaultHandlerSPI implements HandlerSPI {
     private static final Set<String> excludedNamespaces = new HashSet<String>();
     
     static {
-        elements.put(Action.TAG, new Action());
-        elements.put(Container.TAG, new Container());
-        elements.put(Foreach.TAG, new Foreach());
-        elements.put(If.TAG, new If());
-        elements.put(Nobr.TAG, new Nobr());
+        elements.put(Action.ELEMENT, new Action());
+        elements.put(Container.ELEMENT, new Container());
+        elements.put(Each.ELEMENT, new Each());
+        elements.put(If.ELEMENT, new If());
+        elements.put(Nobr.ELEMENT, new Nobr());
         
         attributes.put(IfAttr.ATTRIBUTE, new IfAttr());
         

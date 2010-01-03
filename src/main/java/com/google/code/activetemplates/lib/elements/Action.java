@@ -30,7 +30,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 
 public class Action implements ElementHandler {
 
-    public static final QName TAG = new QName(
+    public static final QName ELEMENT = new QName(
             DefaultHandlerSPI.NAMESPACE_STDLIB, "action");
     private static final QName ATTR_AID = new QName("aid");
 
@@ -40,7 +40,7 @@ public class Action implements ElementHandler {
         if (aid == null)
             throw new IllegalArgumentException("Action aid isn't specified");
 
-        e.getTemplateContext().executeAction(aid.getValue());
+        e.executeAction(aid.getValue());
 
         return Outcome.PROCESS_SIBLINGS;
     }
@@ -52,11 +52,11 @@ public class Action implements ElementHandler {
     public static XMLEvent createActionStartEvent(XMLEventFactory f, String aid) {
         Attribute a = f.createAttribute(ATTR_AID, aid);
 
-        return f.createStartElement(TAG, Collections.singleton(a).iterator(),
+        return f.createStartElement(ELEMENT, Collections.singleton(a).iterator(),
                 Collections.emptySet().iterator());
     }
 
     public static XMLEvent createActionEndEvent(XMLEventFactory f) {
-        return f.createEndElement(TAG, Collections.emptySet().iterator());
+        return f.createEndElement(ELEMENT, Collections.emptySet().iterator());
     }
 }

@@ -35,7 +35,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
  */
 public class Nobr implements ElementHandler {
 
-    public static final QName TAG = new QName(
+    public static final QName ELEMENT = new QName(
             DefaultHandlerSPI.NAMESPACE_STDLIB, "nobr");
 
     public Outcome processStart(StartElementEvent e) {

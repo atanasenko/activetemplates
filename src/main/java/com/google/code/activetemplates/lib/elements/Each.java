@@ -37,10 +37,10 @@ import com.google.code.activetemplates.util.TemplateUtils;
  * @author sleepless
  * 
  */
-public class Foreach implements ElementHandler {
+public class Each implements ElementHandler {
 
-    public static final QName TAG = new QName(
-            DefaultHandlerSPI.NAMESPACE_STDLIB, "foreach");
+    public static final QName ELEMENT = new QName(
+            DefaultHandlerSPI.NAMESPACE_STDLIB, "each");
 
     private static final QName ATTR_DATA = new QName("data");
     private static final QName ATTR_VALUE = new QName("value");
@@ -98,7 +98,7 @@ public class Foreach implements ElementHandler {
                 if(vars[2] != null) te.setExpressionValue(vars[2], oit.getKey());
                 
                 for(XMLEvent e: tree) {
-                    te.queueEvent(e);
+                    te.getTemplateContext().queueEvent(e);
                 }
                 te.getTemplateContext().queueAction(this);
             }

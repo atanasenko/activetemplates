@@ -30,7 +30,7 @@ import com.google.code.activetemplates.events.Action;
  * @author atanasenko
  * 
  */
-public interface TemplateContext {
+public interface XMLStreamContext {
 
     /**
      * Returns generic XMLEventFactory
@@ -77,12 +77,5 @@ public interface TemplateContext {
      * @param a
      */
     public void queueAction(Action a);
-
-    /**
-     * Executes action identified by specified action id
-     * 
-     * @param aid
-     */
-    public void executeAction(String aid);
 
 }

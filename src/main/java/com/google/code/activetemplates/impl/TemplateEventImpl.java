@@ -19,11 +19,11 @@ package com.google.code.activetemplates.impl;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import com.google.code.activetemplates.TemplateContext;
+import com.google.code.activetemplates.XMLStreamContext;
 import com.google.code.activetemplates.events.Action;
 import com.google.code.activetemplates.events.TemplateEvent;
 
-abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
+abstract class TemplateEventImpl implements TemplateEvent, XMLStreamContext {
 
     private CompileContext cc;
     private XMLEvent e;
@@ -123,7 +123,7 @@ abstract class TemplateEventImpl implements TemplateEvent, TemplateContext {
     }
 
     @Override
-    public TemplateContext getTemplateContext() {
+    public XMLStreamContext getTemplateContext() {
         return this;
     }
 

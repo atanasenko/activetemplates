@@ -23,30 +23,10 @@ import com.google.code.activetemplates.util.Services;
 
 public final class Providers {
 
-    private static final List<TemplateSPI> templateProviders;
     private static final List<HandlerSPI> handlerProviders;
 
     static {
-        templateProviders = Services.getProviders(TemplateSPI.class);
         handlerProviders  = Services.getProviders(HandlerSPI.class);
-    }
-    
-    public final static TemplateSPI getTemplateSPI(){
-        if(templateProviders.size() == 0)
-            throw new IllegalStateException("No providers registered");
-        
-        return templateProviders.get(0);
-    }
-    public final static TemplateSPI getTemplateSPI(String provider){
-        if(templateProviders.size() == 0)
-            throw new IllegalStateException("No providers registered");
-        
-        for(TemplateSPI p: templateProviders) {
-            if(p.getProviderName().equals(provider)) {
-                return p;
-            }
-        }
-        throw new IllegalArgumentException("No such provider: " + provider);
     }
     
     public final static List<HandlerSPI> getHandlerSPIs(){

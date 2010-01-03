@@ -24,7 +24,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.TemplateContext;
+import com.google.code.activetemplates.XMLStreamContext;
 import com.google.code.activetemplates.events.StartElementEvent;
 
 public final class TemplateUtils {
@@ -37,7 +37,7 @@ public final class TemplateUtils {
      *            - whether to skip end tag itself, useful from attribute events
      * @throws XMLStreamException
      */
-    public static void skipChildren(TemplateContext tc, boolean skipEnd)
+    public static void skipChildren(XMLStreamContext tc, boolean skipEnd)
             throws XMLStreamException {
         readElements(tc, 1, skipEnd, null);
     }
@@ -48,7 +48,7 @@ public final class TemplateUtils {
      * @param tc
      * @throws XMLStreamException
      */
-    public static void skipSiblings(TemplateContext tc)
+    public static void skipSiblings(XMLStreamContext tc)
             throws XMLStreamException {
         readElements(tc, 2, true, null);
     }
@@ -63,7 +63,7 @@ public final class TemplateUtils {
      * @return queue
      * @throws XMLStreamException
      */
-    public static Queue<XMLEvent> readChildren(TemplateContext tc,
+    public static Queue<XMLEvent> readChildren(XMLStreamContext tc,
             boolean readEnd) throws XMLStreamException {
         Queue<XMLEvent> q = new ArrayDeque<XMLEvent>();
         readElements(tc, 1, readEnd, q);
@@ -77,7 +77,7 @@ public final class TemplateUtils {
      * @return queue
      * @throws XMLStreamException
      */
-    public static Queue<XMLEvent> readSiblings(TemplateContext tc)
+    public static Queue<XMLEvent> readSiblings(XMLStreamContext tc)
             throws XMLStreamException {
         Queue<XMLEvent> q = new ArrayDeque<XMLEvent>();
         readElements(tc, 2, true, q);
@@ -85,7 +85,7 @@ public final class TemplateUtils {
     }
 
     // skip elements until level reaches 0
-    private static void readElements(TemplateContext tc, int initialLevel,
+    private static void readElements(XMLStreamContext tc, int initialLevel,
             boolean readEnd, Queue<XMLEvent> q) throws XMLStreamException {
 
         while (tc.hasNextEvent()) {

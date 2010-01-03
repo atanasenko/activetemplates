@@ -32,7 +32,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
  */
 public class If implements ElementHandler {
 
-    public static final QName TAG = new QName(
+    public static final QName ELEMENT = new QName(
             DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
 
     private static final QName ATTR_CONDITION = new QName("condition");
