@@ -27,10 +27,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 
 import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
+import com.google.code.activetemplates.xml.XmlResult;
+import com.google.code.activetemplates.xml.XmlSource;
 
 public class TemplateMerger {
     
@@ -41,11 +41,11 @@ public class TemplateMerger {
         new QName("name");
     
     private String tName;
-    private Result res;
-    private Source src;
-    private Map<String, Source> inclusions;
+    private XmlResult res;
+    private XmlSource src;
+    private Map<String, XmlSource> inclusions;
 
-    public TemplateMerger(String tName, Result res, Source src, Map<String, Source> inclusions) {
+    public TemplateMerger(String tName, XmlResult res, XmlSource src, Map<String, XmlSource> inclusions) {
         this.tName = tName;
         this.res = res;
         this.src = src;
@@ -57,8 +57,8 @@ public class TemplateMerger {
         XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
         XMLInputFactory inFactory = XMLInputFactory.newInstance();
         
-        XMLEventWriter w = outFactory.createXMLEventWriter(res);
-        XMLEventReader r = inFactory.createXMLEventReader(src);
+        XMLEventWriter w = outFactory.createXMLEventWriter(res.getResult());
+        XMLEventReader r = inFactory.createXMLEventReader(src.getSource());
         
         try {
             while(r.hasNext()) {
@@ -80,9 +80,9 @@ public class TemplateMerger {
                         if(!inclusions.containsKey(v)) {
                             throw new IllegalArgumentException("Inclusion " + v + " not found for template " + tName);
                         }
-                        Source s = inclusions.get(v);
+                        XmlSource s = inclusions.get(v);
                         if(s != null) {
-                            XMLEventReader ir = inFactory.createXMLEventReader(s);
+                            XMLEventReader ir = inFactory.createXMLEventReader(s.getSource());
                             try {
                                 include(w, ir);
                             } finally {

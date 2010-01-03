@@ -16,6 +16,7 @@
 
 package com.google.code.activetemplates.events;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -54,6 +55,12 @@ public interface ElementHandler {
          */
         PROCESS_PARENT;
     }
+    
+    /**
+     * Gets an array of QNames this handler can handle
+     * @return
+     */
+    public QName[] getElements();
     
     /**
      * Processes start element.

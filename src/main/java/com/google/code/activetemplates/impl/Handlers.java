@@ -74,7 +74,7 @@ class Handlers {
         AttributeHandler h = attributes.get(attr.getName());
         if(h == null) throw new IllegalStateException("Attribute " + attr.getName() + " is not handled");
         AttributeEventImpl ev = eventPool.borrowAttributeEvent();
-        ev.init(cc, attr);
+        ev.init(cc, attr, null);
         try {
             AttributeHandler.Outcome o = h.processAttribute(ev);
             return o != null ? o : AttributeHandler.Outcome.PROCESS_ALL;
@@ -88,7 +88,7 @@ class Handlers {
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
         
         StartElementEventImpl ev = eventPool.borrowStartElementEvent();
-        ev.init(cc, el);
+        ev.init(cc, el, cc.getComponentFactory().createComponent(ev, h.getClass()));
         
         try {
             ElementHandler.Outcome o = h.processStart(ev);
@@ -106,7 +106,7 @@ class Handlers {
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
         
         EndElementEventImpl ev = eventPool.borrowEndElementEvent();
-        ev.init(cc, el);
+        ev.init(cc, el, null);
         
         try {
             ElementHandler.Outcome o = h.processEnd(ev);

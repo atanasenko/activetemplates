@@ -18,12 +18,10 @@ package com.google.code.activetemplates.tiles;
 
 import java.util.Map;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-
-
 import com.google.code.activetemplates.Template;
-import com.google.code.activetemplates.cache.XmlCache;
+import com.google.code.activetemplates.xml.XmlCache;
+import com.google.code.activetemplates.xml.XmlResult;
+import com.google.code.activetemplates.xml.XmlSource;
 
 public class TemplateImpl implements Template {
     
@@ -84,16 +82,12 @@ public class TemplateImpl implements Template {
         this.inclusions = inclusions;
     }
 
-    public void close(Source src) {
-        xmlCache.close(src);
-    }
-    
-    public Source createSource(){
+    public XmlSource createSource(){
         if(sourceName == null) return null;
         return xmlCache.createSource(BUILD_PREFIX + name + ".xml");
     }
     
-    public Result createResult() {
+    public XmlResult createResult() {
         if(sourceName == null) throw new IllegalStateException("Empty source");
         return xmlCache.createResult(BUILD_PREFIX + name + ".xml");
     }
@@ -103,12 +97,12 @@ public class TemplateImpl implements Template {
         return xmlCache.contains(RAW_PREFIX + sourceName);
     }
 
-    public Source getRawSource(){
+    public XmlSource getRawSource(){
         if(sourceName == null) return null;
         return xmlCache.createSource(RAW_PREFIX + sourceName);
     }
     
-    public Result createRawResult() {
+    public XmlResult createRawResult() {
         if(sourceName == null) throw new IllegalStateException("Empty source");
         return xmlCache.createResult(RAW_PREFIX + sourceName);
     }

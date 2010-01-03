@@ -17,15 +17,16 @@
 package com.google.code.activetemplates.tiles;
 
 import java.io.File;
-import java.io.IOException;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamSource;
+
+import com.google.code.activetemplates.xml.XmlResult;
+import com.google.code.activetemplates.xml.XmlSource;
+import com.google.code.activetemplates.xml.XmlStreamSource;
 
 public class DirectoryTileSource implements TileSource {
     
@@ -40,40 +41,31 @@ public class DirectoryTileSource implements TileSource {
     }
 
     @Override
-    public Source getTile(String name) {
-        return new StreamSource(new File(dir, name));
+    public XmlSource getTile(String name) {
+        return new XmlStreamSource(new StreamSource(new File(dir, name)));
     }
 
     @Override
-    public boolean readTile(String name, Result res) {
+    public boolean readTile(String name, XmlResult res) {
         
-        Source s = getTile(name);
+        XmlSource s = getTile(name);
         if(s == null) return false;
         
         try {
             
             TransformerFactory tFactory = TransformerFactory.newInstance();
             Transformer t = tFactory.newTransformer();
-            t.transform(s, res);
+            t.transform(s.getSource(), res.getResult());
             
         } catch (TransformerConfigurationException e) {
             throw new IllegalStateException(e);
         } catch (TransformerException e) {
             throw new IllegalStateException(e);
         } finally {
-            close(s);
+            s.close();
         }
         
         return true;
-    }
-
-    @Override
-    public void close(Source src) {
-        StreamSource ss = (StreamSource) src;
-        if(ss.getInputStream() != null){
-            try{ ss.getInputStream().close(); }
-            catch(IOException e){}
-        }
     }
 
 }

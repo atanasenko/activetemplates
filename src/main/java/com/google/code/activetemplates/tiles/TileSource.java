@@ -16,15 +16,13 @@
 
 package com.google.code.activetemplates.tiles;
 
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
+import com.google.code.activetemplates.xml.XmlResult;
+import com.google.code.activetemplates.xml.XmlSource;
 
 public interface TileSource {
 
-    public Source getTile(String name);
+    public XmlSource getTile(String name);
     
-    public boolean readTile(String name, Result res);
-    
-    public void close(Source s);
+    public boolean readTile(String name, XmlResult res);
     
 }

@@ -19,18 +19,22 @@ package com.google.code.activetemplates.impl;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
-import com.google.code.activetemplates.XMLStreamContext;
+import com.google.code.activetemplates.EventStream;
 import com.google.code.activetemplates.events.Action;
+import com.google.code.activetemplates.events.EventComponent;
+import com.google.code.activetemplates.events.EventEnvironment;
 import com.google.code.activetemplates.events.TemplateEvent;
 
-abstract class TemplateEventImpl implements TemplateEvent, XMLStreamContext {
+abstract class TemplateEventImpl implements TemplateEvent, EventStream {
 
     private CompileContext cc;
     private XMLEvent e;
+    private EventComponent ec;
 
-    void init(CompileContext cc, XMLEvent e) {
+    void init(CompileContext cc, XMLEvent e, EventComponent ec) {
         this.cc = cc;
         this.e = e;
+        this.ec = ec;
     }
 
     public void dispose() {
@@ -38,39 +42,6 @@ abstract class TemplateEventImpl implements TemplateEvent, XMLStreamContext {
         e = null;
     }
     
-    /*
-    public TemplateContext getTemplateContext() {
-        return this;
-    }
-
-    public BindingContext getBindingContext() {
-        return cc.getBindingContext();
-    }
-
-    public XMLEvent getEvent() {
-        return e;
-    }
-
-    public void startScope(boolean topLevel) {
-        Bindings b;
-        if (topLevel) {
-            b = cc.getTopLevelBindings();
-        } else {
-            b = getBindingContext().getBindings();
-        }
-        b = cc.getScriptingProvider().createBindings(b);
-        cc.pushBindings(b);
-    }
-
-    public void endScope() {
-        cc.popBindings();
-    }
-
-    public ScriptingProvider getScriptingProvider(){
-        return cc.getScriptingProvider();
-    }
-    */
-
     public <T> T parseExpression(String expression, Class<T> clazz) {
         return cc.parseExpression(expression, clazz);
     }
@@ -107,9 +78,9 @@ abstract class TemplateEventImpl implements TemplateEvent, XMLStreamContext {
 
         String aid = cc.getActionRegistry().registerAction(a);
 
-        cc.queueEvent(com.google.code.activetemplates.lib.elements.Action
+        cc.queueEvent(com.google.code.activetemplates.lib.elements.ActionEl
                 .createActionStartEvent(cc.getElementFactory(), aid));
-        cc.queueEvent(com.google.code.activetemplates.lib.elements.Action
+        cc.queueEvent(com.google.code.activetemplates.lib.elements.ActionEl
                 .createActionEndEvent(cc.getElementFactory()));
     }
 
@@ -123,8 +94,17 @@ abstract class TemplateEventImpl implements TemplateEvent, XMLStreamContext {
     }
 
     @Override
-    public XMLStreamContext getTemplateContext() {
+    public EventStream getEventStream() {
         return this;
     }
 
+    @Override
+    public EventEnvironment getEnvironment(){
+        return cc.getEventEnvironment();
+    }
+
+    public EventComponent getEventComponent() {
+        return ec;
+    }
+    
 }

@@ -20,7 +20,8 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 import javax.xml.stream.XMLStreamException;
-import javax.xml.transform.Result;
+
+import com.google.code.activetemplates.xml.XmlResult;
 
 /**
  * Template compiler takes a template and compiles it into target document
@@ -39,7 +40,7 @@ public interface TemplateCompiler {
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Object context, OutputStream out) throws TemplateCompileException;
+    public void compile(Template t, TemplateModel model, OutputStream out) throws TemplateCompileException;
 
     /**
      * Compiles template into specified reader.
@@ -50,7 +51,7 @@ public interface TemplateCompiler {
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Object context, Writer out) throws TemplateCompileException;
+    public void compile(Template t, TemplateModel model, Writer out) throws TemplateCompileException;
 
     /**
      * Compiles template into specified xml Result.
@@ -60,6 +61,6 @@ public interface TemplateCompiler {
      * @param out
      * @throws XMLStreamException
      */
-    public void compile(Template t, Object context, Result out) throws TemplateCompileException;
+    public void compile(Template t, TemplateModel model, XmlResult out) throws TemplateCompileException;
     
 }

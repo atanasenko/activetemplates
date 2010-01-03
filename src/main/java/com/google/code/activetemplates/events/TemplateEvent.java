@@ -18,7 +18,7 @@ package com.google.code.activetemplates.events;
 
 import javax.xml.stream.events.XMLEvent;
 
-import com.google.code.activetemplates.XMLStreamContext;
+import com.google.code.activetemplates.EventStream;
 
 /**
  * Base interface for all template events.
@@ -62,9 +62,15 @@ public interface TemplateEvent {
     public void executeAction(String aid);
 
     /**
-     * Gets the associated xml stream context
+     * Gets the associated event stream
      * @return
      */
-    public XMLStreamContext getTemplateContext();
-
+    public EventStream getEventStream();
+    
+    /**
+     * Gets current event environment
+     * @return
+     */
+    public EventEnvironment getEnvironment();
+    
 }

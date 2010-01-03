@@ -42,21 +42,28 @@ class CompileContext {
     
     private Deque<XMLEvent> globalQueue;
     private Deque<XMLEvent> eventQueue;
+    private Deque<EventEnvironmentImpl> env;
+
+    private EventComponentFactory eComponentFactory;
+
     private ActionRegistry actionRegistry;
-    
     private ExpressionParser expressionParser;
     private EvaluationContext evaluationContext;
     
-    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, ExpressionParser eParser, EvaluationContext eContext) {
+    public CompileContext(XMLEventReader r, XMLEventWriter w, XMLEventFactory ef, EventComponentFactory ecf, ExpressionParser eParser, EvaluationContext eContext) {
         reader         = r;
         writer         = w;
         elementFactory = ef;
+        eComponentFactory = ecf;
         expressionParser  = eParser;
         evaluationContext = eContext;
         
         globalQueue    = new LinkedList<XMLEvent>();
         eventQueue     = new LinkedList<XMLEvent>();
+        env            = new LinkedList<EventEnvironmentImpl>();
         actionRegistry = new ActionRegistry();
+        
+        env.push(new EventEnvironmentImpl());
     }
 
     public boolean hasNextEvent(){
@@ -64,8 +71,25 @@ class CompileContext {
     }
     
     public XMLEvent nextEvent() throws XMLStreamException {
-        if(globalQueue.size() > 0) return globalQueue.poll();
-        return reader.nextEvent();
+        XMLEvent e;
+        if(globalQueue.size() > 0) {
+            e = globalQueue.poll();
+        } else {
+            e = reader.nextEvent();
+        }
+        
+        if(env.peek().getInnerCount() < 0) {
+            endEnvironment();
+        }
+
+        if(e.isStartElement()) {
+            env.peek().incInnerCount();
+        } else if(e.isEndElement()) {
+            env.peek().decInnerCount();
+        }
+        
+        System.out.println("Next event: " + e);
+        return e;
     }
     
     public XMLEvent peekEvent() throws XMLStreamException {
@@ -74,13 +98,20 @@ class CompileContext {
     }
     
     public void queueEvent(XMLEvent e) {
+        System.out.println("Queuing: " + e);
         eventQueue.offer(e);
     }
     
     public void flushEventQueue() {
-        while(!eventQueue.isEmpty()) {
-            XMLEvent e = eventQueue.pop();
-            globalQueue.addLast(e);
+        if(!eventQueue.isEmpty()) {
+            System.out.println("Flushing queue");
+            System.out.println("  Event queue: " + eventQueue);
+            System.out.println("  Global queue: " + globalQueue);
+            while(!eventQueue.isEmpty()) {
+                XMLEvent e = eventQueue.removeLast();
+                globalQueue.addFirst(e);
+            }
+            System.out.println("  Global queue after: " + globalQueue);
         }
     }
 
@@ -94,6 +125,10 @@ class CompileContext {
     
     public ActionRegistry getActionRegistry() {
         return actionRegistry;
+    }
+    
+    public EventComponentFactory getComponentFactory() {
+        return eComponentFactory;
     }
 
     public EvaluationContext getEvaluationContext(){
@@ -113,6 +148,19 @@ class CompileContext {
     public void setExpressionValue(String expression, Object value) {
         Expression expr = expressionParser.parseExpression(expression);
         expr.setValue(getEvaluationContext(), value);
+    }
+
+    public EventEnvironmentImpl getEventEnvironment() {
+        EventEnvironmentImpl e = env.peek();
+        if(e.getInnerCount() > 0) {
+            env.push(new EventEnvironmentImpl(e));
+            e = env.peek();
+        }
+        return e;
+    }
+    
+    private void endEnvironment() {
+        env.pop();
     }
 
 }

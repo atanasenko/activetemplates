@@ -27,4 +27,10 @@ public interface StartElementEvent extends TemplateEvent {
 
     public StartElement getEvent();
     
+    /**
+     * Gets component associated with this event, or null if none
+     * @return
+     */
+    public EventComponent getEventComponent();
+    
 }

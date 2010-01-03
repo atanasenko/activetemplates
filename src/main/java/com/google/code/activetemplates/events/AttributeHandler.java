@@ -16,6 +16,7 @@
 
 package com.google.code.activetemplates.events;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
 /**
@@ -50,6 +51,12 @@ public interface AttributeHandler {
          */
         PROCESS_NONE;
     }
+    
+    /**
+     * Gets an array of attribute names this handler can handle
+     * @return
+     */
+    public QName[] getAttributes();
     
     /**
      * Process attribute event.

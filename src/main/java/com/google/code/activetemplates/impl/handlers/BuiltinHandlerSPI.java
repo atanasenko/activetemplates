@@ -24,15 +24,13 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+
 
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
-import com.google.code.activetemplates.lib.attributes.IfAttr;
-import com.google.code.activetemplates.lib.elements.Action;
-import com.google.code.activetemplates.lib.elements.Container;
-import com.google.code.activetemplates.lib.elements.Each;
-import com.google.code.activetemplates.lib.elements.If;
-import com.google.code.activetemplates.lib.elements.Nobr;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
 public class BuiltinHandlerSPI implements HandlerSPI {
@@ -45,15 +43,18 @@ public class BuiltinHandlerSPI implements HandlerSPI {
     private static final Set<String> excludedNamespaces = new HashSet<String>();
     
     static {
-        elements.put(Action.ELEMENT, new Action());
-        elements.put(Container.ELEMENT, new Container());
-        elements.put(Each.ELEMENT, new Each());
-        elements.put(If.ELEMENT, new If());
-        elements.put(Nobr.ELEMENT, new Nobr());
         
-        attributes.put(IfAttr.ATTRIBUTE, new IfAttr());
+        try {
+            addElements("com.google.code.activetemplates.lib.elements");
+            addElements("com.google.code.activetemplates.lib.elements.conditional");
+            addElements("com.google.code.activetemplates.lib.elements.form");
+            addAttributes("com.google.code.activetemplates.lib.attributes");
+        } catch(Exception e) {
+            throw new IllegalStateException(e);
+        }
         
         excludedNamespaces.add(NAMESPACE_STDLIB);
+        
     }
 
     public Map<QName, AttributeHandler> getAttributeHandlers() {
@@ -71,5 +72,51 @@ public class BuiltinHandlerSPI implements HandlerSPI {
     public String getProvider(){
         return "builtin";
     }
+    
+    private static final void addElements(String pkgName) throws Exception {
+        Set<Class<ElementHandler>> classes = getClasses(pkgName, ElementHandler.class);
+        for(Class<ElementHandler> cl: classes) {
+            ElementHandler eh = cl.newInstance();
+            for(QName qn: eh.getElements()) {
+                elements.put(qn, eh);
+            }
+        }
+    }
 
+    private static final void addAttributes(String pkgName) throws Exception {
+        Set<Class<AttributeHandler>> classes = getClasses(pkgName, AttributeHandler.class);
+        for(Class<AttributeHandler> cl: classes) {
+            AttributeHandler eh = cl.newInstance();
+            for(QName qn: eh.getAttributes()) {
+                attributes.put(qn, eh);
+            }
+        }
+    }
+
+    private static final <T> Set<Class<T>> getClasses(String pkg, Class<T> clazz) throws Exception {
+
+        pkg = pkg.replace('.', '/');
+        Set<Class<T>> classes = new HashSet<Class<T>>();
+        
+        ResourcePatternResolver res = new PathMatchingResourcePatternResolver();
+        Resource[] resources = res.getResources("classpath*:" + pkg + "/*.class");
+        for(Resource r: resources) {
+            
+            String className = r.getURL().getFile();
+            className = className.substring(className.indexOf(pkg), className.length() - ".class".length());
+            className = className.replace('/', '.');
+
+            try {
+                Class<?> cl = Class.forName(className);
+                if(clazz.isAssignableFrom(cl)) {
+                    @SuppressWarnings("unchecked")
+                    Class<T> tcl = (Class<T>)cl;
+                    classes.add(tcl);
+                }
+            } catch (ClassNotFoundException e) {
+            }
+        }
+        return classes;
+        
+    }
 }

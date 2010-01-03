@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates;
-
-import com.google.code.activetemplates.xml.XmlSource;
+package com.google.code.activetemplates.xml;
 
 /**
- * This class represents a prebuilt xml template document, which can
- * be compile into a target document
+ * This interface is a general contract for caching xml documents.
+ * 
+ * Note that results and sources returned by this class should be closed explicitly
+ * using corresponding close methods defined by this interface.
  * 
  * @author sleepless
+ *
  */
-public interface Template {
-   
+public interface XmlCache {
+
     /**
-     * Template name
+     * Creates a new result and caches xml document written to it.
      * 
+     * @param name
      * @return
      */
-    public String getName();
+    public XmlResult createResult(String name);
     
     /**
-     * Creates a new template document source.
-     * This method returns a new source each time it is called, which must
-     * be closed with close method.
+     * Returns a cached xml document.
      * 
+     * @param name
      * @return
      */
-    public XmlSource createSource();
+    public XmlSource createSource(String name);
+    
+    /**
+     * Returns true if a document with specified name is cached in this XmlCache
+     * @param name
+     * @return
+     */
+    public boolean contains(String name);
     
 }

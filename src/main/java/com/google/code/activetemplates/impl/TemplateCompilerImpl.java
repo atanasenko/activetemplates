@@ -35,11 +35,8 @@ import javax.xml.stream.events.Characters;
 import javax.xml.stream.events.Namespace;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 
-import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -47,20 +44,26 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateCompileException;
 import com.google.code.activetemplates.TemplateCompiler;
+import com.google.code.activetemplates.TemplateModel;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.spi.HandlerSPI;
 import com.google.code.activetemplates.spi.Providers;
+import com.google.code.activetemplates.xml.XmlResult;
+import com.google.code.activetemplates.xml.XmlSource;
+import com.google.code.activetemplates.xml.XmlStreamResult;
 
 public class TemplateCompilerImpl implements TemplateCompiler {
     
     private XMLOutputFactory outFactory;
     private XMLInputFactory inFactory;
     private XMLEventFactory eFactory;
-    private Handlers h;
+    private EventComponentFactory eComponentFactory;
     
     private Set<String> excludedNamespaces;
     private ExpressionParser expressionParser;
+
+    private Handlers h;
     
     public TemplateCompilerImpl(){
 
@@ -80,36 +83,41 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             }
         }
         
+        eComponentFactory = new EventComponentFactory();
         expressionParser = new SpelExpressionParser();
     }
+    
+    
 
     @Override
-    public void compile(Template t, Object context, OutputStream out) throws TemplateCompileException {
-        compile(t, context, new StreamResult(out));
+    public void compile(Template t, TemplateModel model, OutputStream out) throws TemplateCompileException {
+        compile(t, model, new XmlStreamResult(new StreamResult(out)));
     }
 
     @Override
-    public void compile(Template t, Object context, Writer out) throws TemplateCompileException {
-        compile(t, context, new StreamResult(out));
+    public void compile(Template t, TemplateModel model, Writer out) throws TemplateCompileException {
+        compile(t, model, new XmlStreamResult(new StreamResult(out)));
     }
 
     @Override
-    public void compile(final Template t, final Object context, Result out) throws TemplateCompileException {
+    public void compile(final Template t, final TemplateModel model, XmlResult out) throws TemplateCompileException {
         
-        final Source s = t.createSource();
+        final XmlSource s = t.createSource();
         XMLEventReader r = null;
         XMLEventWriter w = null;
         try {
-            r = inFactory.createXMLEventReader(s);
-            w = outFactory.createXMLEventWriter(out);
+            r = inFactory.createXMLEventReader(s.getSource());
+            w = outFactory.createXMLEventWriter(out.getResult());
             final XMLStreamException[] xe = new XMLStreamException[1];
 
             final XMLEventReader fr = r;
             final XMLEventWriter fw = w;
             
-            EvaluationContext eContext = new StandardEvaluationContext(context);
+            StandardEvaluationContext eContext = new StandardEvaluationContext(model);
+            eContext.addPropertyAccessor(new TemplateModelPropertyAccessor());
                         
-            CompileContext ctx = new CompileContext(fr, fw, eFactory, expressionParser, eContext);
+            CompileContext ctx = new CompileContext(fr, fw, 
+                        eFactory, eComponentFactory, expressionParser, eContext);
             doCompile(t.getName(), ctx);
             
             if(xe[0] != null) {
@@ -119,7 +127,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         } catch(XMLStreamException e) {
             throw new TemplateCompileException(e);
         } finally {
-            t.close(s);
+            s.close();
             if(r != null) try{ r.close(); } catch(XMLStreamException e){}
             if(w != null) try{ w.close(); } catch(XMLStreamException e){}
         }
@@ -134,7 +142,9 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             //Location loc = e.getLocation();
             
             if_tag:
-            if(e.isStartElement()) {
+            if(e.isAttribute()) {
+                cc.getWriter().add(e);
+            } else if(e.isStartElement()) {
                 
                 StartElement se = e.asStartElement();
                 
@@ -170,7 +180,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                     }
                     
                     if(h.isAttributeHandled(a.getName())) {
-
+                        System.out.println("Handling attribute: " + a);
                         replaceElement = true;
                         AttributeHandler.Outcome o = h.processAttribute(cc, a);
                         
