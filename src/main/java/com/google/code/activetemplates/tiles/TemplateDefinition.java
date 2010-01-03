@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.def;
+package com.google.code.activetemplates.tiles;
 
 import java.util.Map;
 

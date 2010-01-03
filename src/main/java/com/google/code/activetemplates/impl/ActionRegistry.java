@@ -21,7 +21,7 @@ import java.util.Map;
 
 import com.google.code.activetemplates.events.Action;
 
-public class ActionRegistry {
+class ActionRegistry {
     
     private Map<String, Action> actions;
     

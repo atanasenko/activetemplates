@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.def;
+package com.google.code.activetemplates.tiles;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement(name = "templates")
-public class XmlTemplateDefinitionConfig {
+public interface TemplateDefinitionSource {
     
-    private List<XmlTemplate> templates;
-
-    @XmlElement(name = "template")
-    public List<XmlTemplate> getTemplates() {
-        return templates;
-    }
-
-    public void setTemplates(List<XmlTemplate> templates) {
-        this.templates = templates;
-    }
+    public List<TemplateDefinition> getDefinitions();
     
-
 }

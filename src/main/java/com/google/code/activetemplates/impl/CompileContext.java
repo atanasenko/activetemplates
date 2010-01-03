@@ -31,7 +31,7 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 
-public class CompileContext {
+class CompileContext {
     
     private static final ParserContext TEMPLATE_PARSER_CONTEXT = 
         new TemplateParserContext("${", "}");

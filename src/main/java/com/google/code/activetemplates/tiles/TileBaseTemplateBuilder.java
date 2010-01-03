@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.code.activetemplates.impl;
+package com.google.code.activetemplates.tiles;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,10 +31,7 @@ import javax.xml.transform.Source;
 import com.google.code.activetemplates.Template;
 import com.google.code.activetemplates.TemplateBuilder;
 import com.google.code.activetemplates.cache.XmlCache;
-import com.google.code.activetemplates.def.TemplateDefinition;
-import com.google.code.activetemplates.def.TemplateDefinitionSource;
-import com.google.code.activetemplates.impl.TemplateImpl.Access;
-import com.google.code.activetemplates.tiles.TileSource;
+import com.google.code.activetemplates.tiles.TemplateImpl.Access;
 import com.google.code.activetemplates.util.deps.DependencyNode;
 import com.google.code.activetemplates.util.deps.DependencyTree;
 

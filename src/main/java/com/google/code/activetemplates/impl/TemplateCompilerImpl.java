@@ -96,8 +96,6 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     @Override
     public void compile(final Template t, final Object context, Result out) throws TemplateCompileException {
         
-        final TemplateImpl ti = (TemplateImpl) t;
-        
         final Source s = t.createSource();
         XMLEventReader r = null;
         XMLEventWriter w = null;
@@ -121,7 +119,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         } catch(XMLStreamException e) {
             throw new TemplateCompileException(e);
         } finally {
-            ti.getXmlCache().close(s);
+            t.close(s);
             if(r != null) try{ r.close(); } catch(XMLStreamException e){}
             if(w != null) try{ w.close(); } catch(XMLStreamException e){}
         }
