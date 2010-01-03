@@ -35,7 +35,7 @@ import com.google.code.activetemplates.lib.elements.If;
 import com.google.code.activetemplates.lib.elements.Nobr;
 import com.google.code.activetemplates.spi.HandlerSPI;
 
-public class DefaultHandlerSPI implements HandlerSPI {
+public class BuiltinHandlerSPI implements HandlerSPI {
     
     public static final String NAMESPACE_STDLIB = 
         "http://code.google.com/p/activetemplates/ns/stdlib";
@@ -69,7 +69,7 @@ public class DefaultHandlerSPI implements HandlerSPI {
     }
     
     public String getProvider(){
-        return "default";
+        return "builtin";
     }
 
 }

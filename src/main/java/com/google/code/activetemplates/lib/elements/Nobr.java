@@ -24,7 +24,7 @@ import javax.xml.stream.events.XMLEvent;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 
 /**
  * Causes next 'characters' element to be stripped of whitespaces at the
@@ -36,7 +36,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
 public class Nobr implements ElementHandler {
 
     public static final QName ELEMENT = new QName(
-            DefaultHandlerSPI.NAMESPACE_STDLIB, "nobr");
+            BuiltinHandlerSPI.NAMESPACE_STDLIB, "nobr");
 
     public Outcome processStart(StartElementEvent e) {
         return null;

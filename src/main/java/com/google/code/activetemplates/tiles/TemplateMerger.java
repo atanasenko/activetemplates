@@ -30,12 +30,12 @@ import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 
 public class TemplateMerger {
     
     private static final QName TAG_INCLUDE = 
-        new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "include");
+        new QName(BuiltinHandlerSPI.NAMESPACE_STDLIB, "include");
     
     private static final QName ATTR_NAME = 
         new QName("name");

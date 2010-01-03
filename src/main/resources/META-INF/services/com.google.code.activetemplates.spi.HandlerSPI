@@ -1,1 +1,1 @@
-com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI
+com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI

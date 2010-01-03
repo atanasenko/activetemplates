@@ -26,12 +26,12 @@ import javax.xml.stream.events.XMLEvent;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 
 public class Action implements ElementHandler {
 
     public static final QName ELEMENT = new QName(
-            DefaultHandlerSPI.NAMESPACE_STDLIB, "action");
+            BuiltinHandlerSPI.NAMESPACE_STDLIB, "action");
     private static final QName ATTR_AID = new QName("aid");
 
     public Outcome processStart(StartElementEvent e) {

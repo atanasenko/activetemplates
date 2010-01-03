@@ -21,7 +21,7 @@ import javax.xml.namespace.QName;
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 
 /**
  * Element which start and end tags will be omitted from output.
@@ -34,7 +34,7 @@ import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
  */
 public class Container implements ElementHandler {
 
-    public static final QName ELEMENT = new QName(DefaultHandlerSPI.NAMESPACE_STDLIB, "container");
+    public static final QName ELEMENT = new QName(BuiltinHandlerSPI.NAMESPACE_STDLIB, "container");
 
     public Outcome processStart(StartElementEvent e) {
         return Outcome.PROCESS_CHILDREN;

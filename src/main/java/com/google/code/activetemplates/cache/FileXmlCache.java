@@ -43,7 +43,15 @@ public class FileXmlCache implements XmlCache {
      * Creates a new FileXmlCache which stores xml documents in temporary folder
      */
     public FileXmlCache() {
-        this(null);
+        this((File)null);
+    }
+    
+    /**
+     * Creates a new FileXmlCache which stores xml documents under specified directory
+     * @param file
+     */
+    public FileXmlCache(String file) {
+        this(new File(file));
     }
     
     /**

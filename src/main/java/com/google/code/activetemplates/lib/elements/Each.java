@@ -26,7 +26,7 @@ import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
 import com.google.code.activetemplates.events.StartElementEvent;
 import com.google.code.activetemplates.events.TemplateEvent;
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 import com.google.code.activetemplates.util.ObjectIterator;
 import com.google.code.activetemplates.util.TemplateUtils;
 
@@ -40,7 +40,7 @@ import com.google.code.activetemplates.util.TemplateUtils;
 public class Each implements ElementHandler {
 
     public static final QName ELEMENT = new QName(
-            DefaultHandlerSPI.NAMESPACE_STDLIB, "each");
+            BuiltinHandlerSPI.NAMESPACE_STDLIB, "each");
 
     private static final QName ATTR_DATA = new QName("data");
     private static final QName ATTR_VALUE = new QName("value");

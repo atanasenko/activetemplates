@@ -5,12 +5,12 @@ import javax.xml.stream.events.Attribute;
 
 import com.google.code.activetemplates.events.AttributeEvent;
 import com.google.code.activetemplates.events.AttributeHandler;
-import com.google.code.activetemplates.impl.handlers.DefaultHandlerSPI;
+import com.google.code.activetemplates.impl.handlers.BuiltinHandlerSPI;
 
 public class IfAttr implements AttributeHandler {
 
     public static final QName ATTRIBUTE = new QName(
-            DefaultHandlerSPI.NAMESPACE_STDLIB, "if");
+            BuiltinHandlerSPI.NAMESPACE_STDLIB, "if");
 
     public Outcome processAttribute(AttributeEvent e) {
 

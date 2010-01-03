@@ -43,6 +43,10 @@ public class XmlTemplateDefinitionSource implements TemplateDefinitionSource {
         
     }
     
+    public XmlTemplateDefinitionSource(String file) {
+        this(new File(file));
+    }
+
     public XmlTemplateDefinitionSource(File f) {
         this(new StreamSource(f));
     }

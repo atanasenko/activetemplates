@@ -31,6 +31,10 @@ public class DirectoryTileSource implements TileSource {
     
     private File dir;
     
+    public DirectoryTileSource(String dir) {
+        this(new File(dir));
+    }
+
     public DirectoryTileSource(File dir) {
         this.dir = dir;
     }
