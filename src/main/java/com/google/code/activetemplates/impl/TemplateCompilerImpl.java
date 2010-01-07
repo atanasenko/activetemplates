@@ -21,6 +21,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,6 +38,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.stream.StreamResult;
 
+import org.codehaus.stax2.XMLOutputFactory2;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -47,6 +49,7 @@ import com.google.code.activetemplates.TemplateCompiler;
 import com.google.code.activetemplates.TemplateModel;
 import com.google.code.activetemplates.events.AttributeHandler;
 import com.google.code.activetemplates.events.ElementHandler;
+import com.google.code.activetemplates.events.AttributeHandler.Outcome;
 import com.google.code.activetemplates.spi.HandlerSPI;
 import com.google.code.activetemplates.spi.Providers;
 import com.google.code.activetemplates.xml.XmlResult;
@@ -68,6 +71,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
     public TemplateCompilerImpl(){
 
         outFactory = XMLOutputFactory.newInstance();
+        outFactory.setProperty(XMLOutputFactory2.IS_REPAIRING_NAMESPACES, true);
         inFactory = XMLInputFactory.newInstance();
         eFactory = XMLEventFactory.newInstance();
         
@@ -141,15 +145,32 @@ public class TemplateCompilerImpl implements TemplateCompiler {
 
             //Location loc = e.getLocation();
             
-            if_tag:
             if(e.isAttribute()) {
-                cc.getWriter().add(e);
+                //System.out.println("Adding " + e);
+                
+                // attributes added during tag processing and under the same tag
+                // get handled here, outcome is always PROCESS_ALL
+                
+                Attribute a = (Attribute) e;
+                if(h.isAttributeHandled(a.getName())) {
+                    h.processAttribute(cc, a);
+                } else {
+                    String value = a.getValue();
+                    String nvalue = processText(cc, value);
+                    if(nvalue != null) {
+                        a = cc.getElementFactory().createAttribute(a.getName(), nvalue);
+                    }
+                    //System.out.println("Adding " + e);
+                    cc.getWriter().add(a);
+                }                
+                
             } else if(e.isStartElement()) {
                 
                 StartElement se = e.asStartElement();
                 
-                boolean replaceElement = false;
+                Processing processing = Processing.DEFAULT;
                 
+                // collect namespaces
                 @SuppressWarnings("unchecked")
                 Iterator<Namespace> nsit = se.getNamespaces();
                 List<Namespace> namespaces = new ArrayList<Namespace>();
@@ -157,86 +178,99 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 while(nsit.hasNext()) {
                     Namespace ns = nsit.next();
                     if(excludedNamespaces.contains(ns.getNamespaceURI())) {
-                        replaceElement = true;
+                        processing = Processing.REPLACE;
                     } else {
                         namespaces.add(ns);
                     }
                 }
                 
+                // collect attributes
                 @SuppressWarnings("unchecked")
                 Iterator<Attribute> it = se.getAttributes();
-                List<Attribute> attributes = new ArrayList<Attribute>();
+                List<Attribute> attributes = new LinkedList<Attribute>();
+                while(it.hasNext()) {
+                    attributes.add(it.next());
+                }
+                
+                // collect any separate attribute and namespace xml events
+                while(cc.hasNextEvent()) {
+                    if(cc.peekEvent().isNamespace()) {
+                        namespaces.add((Namespace)cc.nextEvent());
+                        processing = Processing.REPLACE;
+                    } else if(cc.peekEvent().isAttribute()) {
+                        attributes.add((Attribute)cc.nextEvent());
+                        processing = Processing.REPLACE;
+                    } else {
+                        break;
+                    }
+                }
                 
                 // preprocess attributes
-                cycle_attr:
-                while(it.hasNext()) {
+                it = attributes.iterator();
+                attributes = new ArrayList<Attribute>();
+                
+                while(it.hasNext() && processing != Processing.SKIP) {
                     Attribute a = it.next();
                     
-                    String value = a.getValue();
-                    String nvalue = processText(cc, value);
-                    if(nvalue != null) {
-                        a = cc.getElementFactory().createAttribute(a.getName(), nvalue);
-                        replaceElement = true;
-                    }
-                    
                     if(h.isAttributeHandled(a.getName())) {
-                        System.out.println("Handling attribute: " + a);
-                        replaceElement = true;
+                        processing = Processing.REPLACE;
+
                         AttributeHandler.Outcome o = h.processAttribute(cc, a);
-                        
-                        switch(o) {
-                        case PROCESS_TAG:
-                            break cycle_attr;
-                            
-                        case PROCESS_NONE:
-                            skipChildren(cc, false);
-                            break if_tag;
+                        if(o == Outcome.PROCESS_NONE) {
+                            processing = Processing.SKIP;
                         }
                         
                     } else {
+                        String value = a.getValue();
+                        String nvalue = processText(cc, value);
+                        if(nvalue != null) {
+                            a = cc.getElementFactory().createAttribute(a.getName(), nvalue);
+                            processing = Processing.REPLACE;
+                        }
+                        
                         attributes.add(a);
                     }
                 }
-                
-                if(replaceElement) {
-                    // replace element with new one
-                    se = cc.getElementFactory()
-                            .createStartElement(
-                                    se.getName(), 
-                                    attributes.iterator(), 
-                                    namespaces.iterator());
-                }
-                
-                // handle start element
-                if(h.isElementHandled(se.getName())) {
-                    ElementHandler.Outcome o = h.processStartElement(cc, se);
-                    cc.flushEventQueue();
-                    switch(o){ 
-                    case PROCESS_SIBLINGS:
-                        skipChildren(cc, true);
-                        break;
-                    }
+
+                if(processing == Processing.SKIP) {
+                    
+                    skipChildren(cc, false);
+                    
                 } else {
-                    cc.getWriter().add(se);
-                    cc.flushEventQueue(); // flush events added by any attribute handlers
+                
+                    if(processing == Processing.REPLACE) {
+                        // replace element with new one
+                        se = cc.getElementFactory()
+                                .createStartElement(
+                                        se.getName(), 
+                                        attributes.iterator(), 
+                                        namespaces.iterator());
+                    }
+                    
+                    // handle start element
+                    if(h.isElementHandled(se.getName())) {
+                        ElementHandler.Outcome o = h.processStartElement(cc, se);
+                        cc.flushEventQueue();
+                        switch(o){ 
+                        case PROCESS_SIBLINGS:
+                            skipChildren(cc, true);
+                            break;
+                        }
+                    } else {
+                        //System.out.println("Adding " + se);
+                        cc.getWriter().add(se);
+                        cc.flushEventQueue(); // flush events added by any attribute handlers
+                    }
                 }
                 
             } else if(e.isEndElement()) {
                 
                 // handle end element
                 if(h.isElementHandled(e.asEndElement().getName())) {
-                    ElementHandler.Outcome o = h.processEndElement(cc, e.asEndElement());
+                    h.processEndElement(cc, e.asEndElement());
                     cc.flushEventQueue();
-
-                    switch(o){ 
-                    case PROCESS_PARENT:
-                        skipSiblings(cc);
-                        break;
-                    
-                    case PROCESS_SIBLINGS:
-                        break;
-                    }
                 } else {
+                    //System.out.println("Adding " + e);
                     cc.getWriter().add(e);
                 }
                 
@@ -249,6 +283,7 @@ public class TemplateCompilerImpl implements TemplateCompiler {
                 if(ns != null) {
                     ce = cc.getElementFactory().createCharacters(ns);
                 }
+                //System.out.println("Adding " + e);
                 cc.getWriter().add(ce);
                 
             }
@@ -271,11 +306,6 @@ public class TemplateCompilerImpl implements TemplateCompiler {
         skipElements(cc, 1, processEnd);
     }
 
-    // skip all elements until parent tag's end is encountered
-    private static void skipSiblings(CompileContext cc) throws XMLStreamException {
-        skipElements(cc, 2, true);
-    }
-    
     // skip elements until level reaches 0
     private static void skipElements(CompileContext cc, int initialLevel, boolean processEnd) throws XMLStreamException {
         
@@ -297,6 +327,12 @@ public class TemplateCompilerImpl implements TemplateCompiler {
             
         }
         
+    }
+    
+    private enum Processing {
+        SKIP,
+        REPLACE,
+        DEFAULT;
     }
     
 }

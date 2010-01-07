@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<at:container xmlns:at="http://code.google.com/p/activetemplates/ns/stdlib"><at:nobr/>
+    <textarea 
+        name="${#form.currentName}" 
+        at:attributes="#form.informalAttributes">${#form.currentValue}</textarea><at:nobr/>
+</at:container>

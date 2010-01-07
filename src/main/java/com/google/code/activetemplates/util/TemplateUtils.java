@@ -138,6 +138,23 @@ public final class TemplateUtils {
     }
 
     /**
+     * Returns value of the specified attribute or defValue, if no such
+     * attribute is specified
+     * 
+     * @param se
+     * @param attribute
+     * @param defValue
+     * @return
+     */
+    public static boolean getBooleanAttribute(StartElementEvent se, QName attribute,
+            boolean defValue) {
+        Attribute a = se.getEvent().getAttributeByName(attribute);
+        if (a == null)
+            return defValue;
+        return Boolean.parseBoolean(a.getValue());
+    }
+
+    /**
      * Returns value of the specified attribute, or throws an
      * IllegalArgumentException if no such attribute is specified
      * 

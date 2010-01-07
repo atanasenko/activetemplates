@@ -88,7 +88,7 @@ class CompileContext {
             env.peek().decInnerCount();
         }
         
-        System.out.println("Next event: " + e);
+        //System.out.println("Next event: " + e);
         return e;
     }
     
@@ -98,20 +98,20 @@ class CompileContext {
     }
     
     public void queueEvent(XMLEvent e) {
-        System.out.println("Queuing: " + e);
+        //System.out.println("Queuing: " + e);
         eventQueue.offer(e);
     }
     
     public void flushEventQueue() {
         if(!eventQueue.isEmpty()) {
-            System.out.println("Flushing queue");
-            System.out.println("  Event queue: " + eventQueue);
-            System.out.println("  Global queue: " + globalQueue);
+            //System.out.println("Flushing queue");
+            //System.out.println("  Event queue: " + eventQueue);
+            //System.out.println("  Global queue: " + globalQueue);
             while(!eventQueue.isEmpty()) {
                 XMLEvent e = eventQueue.removeLast();
                 globalQueue.addFirst(e);
             }
-            System.out.println("  Global queue after: " + globalQueue);
+            //System.out.println("  Global queue after: " + globalQueue);
         }
     }
 
@@ -138,6 +138,11 @@ class CompileContext {
     public <T> T parseExpression(String expression, Class<T> clazz) {
         Expression expr = expressionParser.parseExpression(expression);
         return expr.getValue(getEvaluationContext(), clazz);
+    }
+    
+    public <T> T parseExpression(String expression, Object rootObject, Class<T> clazz) {
+        Expression expr = expressionParser.parseExpression(expression);
+        return expr.getValue(getEvaluationContext(), rootObject, clazz);
     }
     
     public <T> T parseTemplateExpression(String expression, Class<T> clazz) {

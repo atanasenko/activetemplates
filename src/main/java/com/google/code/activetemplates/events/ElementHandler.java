@@ -46,14 +46,7 @@ public interface ElementHandler {
          * 
          * Skips any children if returned from processStart
          */
-        PROCESS_SIBLINGS,
-        
-        /**
-         * Skips processing any siblings and process parent element's end.
-         * 
-         * May only be returned from processEnd
-         */
-        PROCESS_PARENT;
+        PROCESS_SIBLINGS;
     }
     
     /**
@@ -73,11 +66,10 @@ public interface ElementHandler {
     
     /**
      * Processes end element.
-     * Possible outcomes: PROCESS_SIBLINGS, PROCESS_PARENT
      * 
      * @param e
      * @return
      */
-    public Outcome processEnd(EndElementEvent e) throws XMLStreamException;
+    public void processEnd(EndElementEvent e) throws XMLStreamException;
     
 }

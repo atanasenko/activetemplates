@@ -72,8 +72,7 @@ public class EachEl implements ElementHandler {
         return null;
     }
 
-    public Outcome processEnd(EndElementEvent e) {
-        return null;
+    public void processEnd(EndElementEvent e) {
     }
 
     private static class EachAction implements

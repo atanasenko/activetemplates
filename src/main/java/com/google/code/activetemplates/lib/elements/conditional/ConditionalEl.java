@@ -24,8 +24,7 @@ public class ConditionalEl implements ElementHandler {
         return null;
     }
 
-    public Outcome processEnd(EndElementEvent e) {
-        return null;
+    public void processEnd(EndElementEvent e) {
     }
     
     protected Outcome processIf(StartElementEvent e, boolean cond) {

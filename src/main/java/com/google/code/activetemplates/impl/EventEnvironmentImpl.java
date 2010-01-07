@@ -32,6 +32,11 @@ class EventEnvironmentImpl implements EventEnvironment {
     public <T> T get(String name, Class<T> clazz) {
         return clazz.cast(get(name));
     }
+    
+    @Override
+    public <T> T get(Class<T> clazz) {
+        return get(clazz.getName(), clazz);
+    }
 
     @Override
     public void put(String name, Object value) {
@@ -39,6 +44,16 @@ class EventEnvironmentImpl implements EventEnvironment {
             data = new HashMap<String, Object>();
         }
         data.put(name, value);
+    }
+
+    @Override
+    public <T> void put(Class<? extends T> clazz, T value) {
+        put(clazz.getName(), value);
+    }
+    
+    @Override
+    public void put(Object value) {
+        put(value.getClass(), value);
     }
 
     public int getInnerCount() {

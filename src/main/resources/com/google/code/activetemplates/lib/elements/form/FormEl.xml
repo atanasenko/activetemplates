@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
-<at:container xmlns:at="http://code.google.com/p/activetemplates/ns/stdlib">
+<at:container xmlns:at="http://code.google.com/p/activetemplates/ns/stdlib"><at:nobr/>
     <form method="${#form.method}" action="${#form.action}" at:attributes="#form.informalAttributes">
         <at:body/>
-    </form>
+    </form><at:nobr/>
 </at:container>

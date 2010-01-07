@@ -44,17 +44,16 @@ public class ActionEl implements ElementHandler {
         if (aid == null)
             throw new IllegalArgumentException("Action aid isn't specified");
 
-        e.executeAction(aid.getValue());
+        e.executeAction(e.parseExpression(aid.getValue(), String.class));
 
         return Outcome.PROCESS_CHILDREN;
     }
 
-    public Outcome processEnd(EndElementEvent e) {
-        return null;
+    public void processEnd(EndElementEvent e) {
     }
 
     public static XMLEvent createActionStartEvent(XMLEventFactory f, String aid) {
-        Attribute a = f.createAttribute(ATTR_AID, aid);
+        Attribute a = f.createAttribute(ATTR_AID, "'" + aid + "'");
 
         return f.createStartElement(ELEMENT, Collections.singleton(a).iterator(),
                 Collections.emptySet().iterator());

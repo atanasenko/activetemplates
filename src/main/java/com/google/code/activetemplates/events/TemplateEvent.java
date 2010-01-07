@@ -48,6 +48,25 @@ public interface TemplateEvent {
     public <T> T parseExpression(String expression, Class<T> clazz);
     
     /**
+     * Parses template expression using current evaluation context
+     * @param <T>
+     * @param expression
+     * @param clazz
+     * @return
+     */
+    public <T> T parseTemplateExpression(String expression, Class<T> clazz);
+
+    /**
+     * Parses expression using current evaluation context and specified root object
+     * @param <T>
+     * @param expression
+     * @param rootObject
+     * @param clazz
+     * @return
+     */
+    public <T> T parseExpression(String expression, Object rootObject, Class<T> clazz);
+
+    /**
      * Set expression value
      * @param expression
      * @param value

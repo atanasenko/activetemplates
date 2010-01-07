@@ -58,8 +58,8 @@ public class IfEl extends ConditionalEl {
         return processIf(e, cond);
     }
 
-    public Outcome processEnd(EndElementEvent e) {
-        return processEndIf(e);
+    public void processEnd(EndElementEvent e) {
+        processEndIf(e);
     }
 
 }

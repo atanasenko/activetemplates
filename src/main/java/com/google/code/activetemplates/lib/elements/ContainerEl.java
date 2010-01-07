@@ -44,8 +44,7 @@ public class ContainerEl implements ElementHandler {
         return Outcome.PROCESS_CHILDREN;
     }
 
-    public Outcome processEnd(EndElementEvent e) {
-        return Outcome.PROCESS_SIBLINGS;
+    public void processEnd(EndElementEvent e) {
     }
 
 }

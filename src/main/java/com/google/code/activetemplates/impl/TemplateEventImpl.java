@@ -46,6 +46,14 @@ abstract class TemplateEventImpl implements TemplateEvent, EventStream {
         return cc.parseExpression(expression, clazz);
     }
     
+    public <T> T parseTemplateExpression(String expression, Class<T> clazz) {
+        return cc.parseTemplateExpression(expression, clazz);
+    }
+    
+    public <T> T parseExpression(String expression, Object rootObject, Class<T> clazz) {
+        return cc.parseExpression(expression, rootObject, clazz);
+    }
+
     public void setExpressionValue(String expression, Object value) {
         cc.setExpressionValue(expression, value);
     }
@@ -76,12 +84,16 @@ abstract class TemplateEventImpl implements TemplateEvent, EventStream {
 
     public void queueAction(Action a) {
 
-        String aid = cc.getActionRegistry().registerAction(a);
+        String aid = registerAction(a);
 
         cc.queueEvent(com.google.code.activetemplates.lib.elements.ActionEl
                 .createActionStartEvent(cc.getElementFactory(), aid));
         cc.queueEvent(com.google.code.activetemplates.lib.elements.ActionEl
                 .createActionEndEvent(cc.getElementFactory()));
+    }
+    
+    public String registerAction(Action a) {
+        return cc.getActionRegistry().registerAction(a);
     }
 
     public void executeAction(String aid) {

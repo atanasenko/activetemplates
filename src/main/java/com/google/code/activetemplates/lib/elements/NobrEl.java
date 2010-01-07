@@ -46,7 +46,7 @@ public class NobrEl implements ElementHandler {
         return null;
     }
 
-    public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
+    public void processEnd(EndElementEvent e) throws XMLStreamException {
         XMLEvent ne = e.getEventStream().nextEvent();
 
         if (ne.isCharacters()) {
@@ -58,7 +58,6 @@ public class NobrEl implements ElementHandler {
         } else {
             e.getEventStream().queueEvent(ne);
         }
-        return null;
     }
 
 }

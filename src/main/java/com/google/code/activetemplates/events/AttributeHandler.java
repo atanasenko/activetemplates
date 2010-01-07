@@ -41,11 +41,6 @@ public interface AttributeHandler {
         PROCESS_ALL,
         
         /**
-         * Skips processing remaining attributes
-         */
-        PROCESS_TAG,
-        
-        /**
          * Skips processing the tag and its children.
          * Tags start element handler will not be called
          */

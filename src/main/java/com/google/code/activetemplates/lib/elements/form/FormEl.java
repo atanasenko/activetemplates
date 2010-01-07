@@ -1,10 +1,7 @@
 package com.google.code.activetemplates.lib.elements.form;
 
-import java.util.List;
-
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
 
 import com.google.code.activetemplates.events.ElementHandler;
 import com.google.code.activetemplates.events.EndElementEvent;
@@ -20,59 +17,33 @@ public class FormEl implements ElementHandler {
     public QName[] getElements() {
         return new QName[]{ ELEMENT };
     }
-
-    public static final QName ATTR_ACTION = new QName("action");
-    public static final QName ATTR_METHOD = new QName("method");
+    public static final QName ATTR_COMMAND_NAME = new QName("commandName");
+    
+    private static final QName[] FORMAL_PARAMETERS = new QName[]{ 
+        FormConstants.ATTR_ACTION, 
+        FormConstants.ATTR_METHOD, 
+        ATTR_COMMAND_NAME
+    };
     
     @Override
     public Outcome processStart(StartElementEvent e) throws XMLStreamException {
-        String action = "";
-        String method = "post";
-        Attribute aAction = e.getEvent().getAttributeByName(ATTR_ACTION);
-        Attribute aMethod = e.getEvent().getAttributeByName(ATTR_METHOD);
-        if(aAction != null) action = aAction.getValue();
-        if(aMethod != null) method = aMethod.getValue();
+        String action = TemplateUtils.getAttribute(e, FormConstants.ATTR_ACTION, "");
+        String method = TemplateUtils.getAttribute(e, FormConstants.ATTR_METHOD, "post");
+        String command = TemplateUtils.getAttribute(e, ATTR_COMMAND_NAME, "command");
         
-        FormBean fb = new FormBean();
-        fb.setAction(action);
-        fb.setMethod(method);
-        fb.setInformalAttributes(TemplateUtils.getInformalAttributes(e, ATTR_ACTION, ATTR_METHOD));
+        FormBean form = new FormBean();
+        form.setAction(action);
+        form.setMethod(method);
+        form.setCommandObject(e.parseExpression(command, Object.class));
+        form.setInformalAttributes(TemplateUtils.getInformalAttributes(e, FORMAL_PARAMETERS));
         
-        e.setExpressionValue("#form", fb);
+        e.getEnvironment().put(form);
+        
+        e.setExpressionValue("#form", form);
         return e.getEventComponent().writeComponent();
     }
 
     @Override
-    public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
-        return null;
-    }
-
-    public static class FormBean {
-        
-        private String method;
-        private String action;
-        private List<Attribute> informalAttributes; 
-        
-        public String getMethod() {
-            return method;
-        }
-        public void setMethod(String method) {
-            this.method = method;
-        }
-        
-        public String getAction() {
-            return action;
-        }
-        public void setAction(String action) {
-            this.action = action;
-        }
-        
-        public List<Attribute> getInformalAttributes() {
-            return informalAttributes;
-        }
-        public void setInformalAttributes(List<Attribute> informalAttributes) {
-            this.informalAttributes = informalAttributes;
-        }
-        
+    public void processEnd(EndElementEvent e) throws XMLStreamException {
     }
 }

@@ -92,16 +92,13 @@ class Handlers {
         
         try {
             ElementHandler.Outcome o = h.processStart(ev);
-            if(o == Outcome.PROCESS_PARENT) {
-                throw new IllegalStateException(o + " may not be returned from start element");
-            }
             return o != null ? o : Outcome.PROCESS_CHILDREN;
         } finally {
             eventPool.returnStartElementEvent(ev);
         }
     }
 
-    public ElementHandler.Outcome processEndElement(CompileContext cc, EndElement el) throws XMLStreamException {
+    public void processEndElement(CompileContext cc, EndElement el) throws XMLStreamException {
         ElementHandler h = elements.get(el.getName());
         if(h == null) throw new IllegalStateException("Element " + el.getName() + " is not handled");
         
@@ -109,11 +106,7 @@ class Handlers {
         ev.init(cc, el, null);
         
         try {
-            ElementHandler.Outcome o = h.processEnd(ev);
-            if(o == Outcome.PROCESS_CHILDREN) {
-                throw new IllegalStateException(o + " may not be returned from end element");
-            }
-            return o != null ? o : Outcome.PROCESS_SIBLINGS;
+            h.processEnd(ev);
         } finally {
             eventPool.returnEndElementEvent(ev);
         }

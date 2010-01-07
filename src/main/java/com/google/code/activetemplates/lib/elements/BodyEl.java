@@ -38,9 +38,7 @@ public class BodyEl implements ElementHandler {
     }
     
     @Override
-    public Outcome processEnd(EndElementEvent e) throws XMLStreamException {
-        // TODO Auto-generated method stub
-        return null;
+    public void processEnd(EndElementEvent e) throws XMLStreamException {
     }
 
     public static void setBody(TemplateEvent e, Queue<XMLEvent> body) {

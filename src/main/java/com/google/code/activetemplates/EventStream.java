@@ -72,6 +72,13 @@ public interface EventStream {
     public void queueEvent(XMLEvent event);
 
     /**
+     * Registers a new action and returns its id
+     * @param a
+     * @return
+     */
+    public String registerAction(Action a);
+    
+    /**
      * Creates a new action xml event and queues it using queueEvent() method.
      * 
      * @param a
